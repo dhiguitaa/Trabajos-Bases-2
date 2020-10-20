@@ -222,12 +222,86 @@ public class parte2 implements ActionListener {
       MongoCollection<Document> dpto = db.getCollection("dpto");
       MongoCollection<Document> ciudad = db.getCollection("ciudad");
       MongoCollection<Document> sucursal = db.getCollection("sucursal");
-
-      FindIterable<Document> findIterable = sucursal.find().sort(Sorts.descending("ventaTotal")).limit(3);
-      for (Document document : findIterable) {
-        System.out.println(document);
+      // marca
+      System.out.println("marca");
+      FindIterable<Document> elementosMarca = marca.find().sort(Sorts.descending("ventaTotal")).limit(3);
+      for (Document document : elementosMarca) {
+        String resultado = "";
+        resultado+="nombre: "+document.get("nombre");
+        resultado+=", descripcion: "+document.get("descripcion");
+        resultado+=", ventas totales: "+document.get("ventaTotal");
+        System.out.println(resultado);
       }
-      // informacion.setText("holi, gracias por dar clic");
+      //producto
+      System.out.println("producto");
+      FindIterable<Document> elementosProducto = producto.find().sort(Sorts.descending("ventaTotal")).limit(3);
+      for (Document document : elementosProducto) {
+        String resultado = "";
+        resultado+="nombre: "+document.get("nombre");
+        resultado+=", codbarras: "+document.get("codbarras");
+        resultado+=", ventas totales: "+document.get("ventaTotal");
+        System.out.println(resultado);
+      }
+      //gremio
+      System.out.println("gremio");
+      FindIterable<Document> elementosGremio = gremio.find().sort(Sorts.descending("ventaTotal")).limit(3);
+      for (Document document : elementosGremio) {
+        String resultado = "";
+        resultado+="nombre: "+document.get("nombre");
+        resultado+=", codigo: "+document.get("codigo");
+        resultado+=", ventas totales: "+document.get("ventaTotal");
+        System.out.println(resultado);
+      }
+      //Vendedor
+      System.out.println("vendedor");
+      FindIterable<Document> elementosVendedor = vendedor.find().sort(Sorts.descending("ventaTotal")).limit(3);
+      for (Document document : elementosVendedor) {
+        String resultado = "";
+        resultado+="nombre: "+document.get("nombre");
+        resultado+=", codigo: "+document.get("codigo");
+        resultado+=", ventas totales: "+document.get("ventaTotal");
+        System.out.println(resultado);
+      }
+      //Pais
+      System.out.println("pais");
+      FindIterable<Document> elementosPais = pais.find().sort(Sorts.descending("ventaTotal")).limit(3);
+      for (Document document : elementosPais) {
+        String resultado = "";
+        resultado+="nombre: "+document.get("nombre");
+        resultado+=", ventas totales: "+document.get("ventaTotal");
+        System.out.println(resultado);
+      }
+      //Dpto
+      System.out.println("dpto");
+      FindIterable<Document> elementosDpto = dpto.find().sort(Sorts.descending("ventaTotal")).limit(3);
+      for (Document document : elementosDpto) {
+        String resultado = "";
+        resultado+="nombre: "+document.get("nombre");
+        resultado+=", codigo: "+document.get("codigo");
+        resultado+=", ventas totales: "+document.get("ventaTotal");
+        System.out.println(resultado);
+      }
+      //Ciudad
+      System.out.println("ciudad");
+      FindIterable<Document> elementosCiudad = ciudad.find().sort(Sorts.descending("ventaTotal")).limit(3);
+      for (Document document : elementosCiudad) {
+        String resultado = "";
+        resultado+="nombre: "+document.get("nombre");
+        resultado+=", codigo: "+document.get("codigo");
+        resultado+=", ventas totales: "+document.get("ventaTotal");
+        System.out.println(resultado);
+      }
+      //Sucursal
+      System.out.println("sucursal");
+      FindIterable<Document> elementosSucursal = sucursal.find().sort(Sorts.descending("ventaTotal")).limit(3);
+      for (Document document : elementosSucursal) {
+        String resultado = "";
+        resultado+="nombre: "+document.get("nombre");
+        resultado+=", codigo: "+document.get("codigo");
+        resultado+=", ventas totales: "+document.get("ventaTotal");
+        System.out.println(resultado);
+      }
+      
     }
 
   }

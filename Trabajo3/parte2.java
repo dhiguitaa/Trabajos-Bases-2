@@ -1,10 +1,13 @@
 import com.mongodb.client.MongoClients;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoClient;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.ConnectionString;
 import com.mongodb.ServerAddress;
 import com.mongodb.MongoCredential;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Sorts;
+
 import java.util.Arrays;
 import java.util.*;
 import java.sql.*;
@@ -12,6 +15,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+
 import java.awt.FlowLayout;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoClient;
@@ -22,6 +27,7 @@ import org.bson.Document;
 public class parte2 implements ActionListener {
 
   JButton extraer, visualizar;
+  JLabel informacion;
   JFrame jf = new JFrame("Formulario");
 
   public parte2() {
@@ -29,10 +35,13 @@ public class parte2 implements ActionListener {
     jf.setLayout(new FlowLayout());
     extraer = new JButton("Generar y cargar estadisticas");
     visualizar = new JButton("Visualizar estadisticas");
+    informacion = new JLabel();
     extraer.addActionListener(this);
+    visualizar.addActionListener(this);
 
     jf.add(extraer);
     jf.add(visualizar);
+    jf.add(informacion);
     jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);// finaliza el programa cuando se da click en la X
     jf.setResizable(false);// para configurar si se redimensiona la ventana
     jf.setSize(600, 600);// configurando tamaño de la ventana (ancho, alto)
@@ -56,7 +65,14 @@ public class parte2 implements ActionListener {
       MongoCollection<Document> dpto = db.getCollection("dpto");
       MongoCollection<Document> ciudad = db.getCollection("ciudad");
       MongoCollection<Document> sucursal = db.getCollection("sucursal");
-
+      marca.drop();
+      producto.drop();
+      gremio.drop();
+      vendedor.drop();
+      pais.drop();
+      dpto.drop();
+      ciudad.drop();
+      sucursal.drop();
       try { // Se carga el driver JDBC-ODBC
         Class.forName("oracle.jdbc.driver.OracleDriver");
       } catch (final Exception err) {
@@ -194,6 +210,24 @@ public class parte2 implements ActionListener {
         System.out.println("error");
         System.out.println(err);
       }
+    }
+    if(e.getSource() == visualizar){
+      MongoClient mongoClient = MongoClients.create("mongodb://127.0.0.1:27017");
+      MongoDatabase db = mongoClient.getDatabase("parte2");
+      MongoCollection<Document> marca = db.getCollection("marca");
+      MongoCollection<Document> producto = db.getCollection("producto");
+      MongoCollection<Document> gremio = db.getCollection("gremio");
+      MongoCollection<Document> vendedor = db.getCollection("vendedor");
+      MongoCollection<Document> pais = db.getCollection("pais");
+      MongoCollection<Document> dpto = db.getCollection("dpto");
+      MongoCollection<Document> ciudad = db.getCollection("ciudad");
+      MongoCollection<Document> sucursal = db.getCollection("sucursal");
+
+      FindIterable<Document> findIterable = sucursal.find().sort(Sorts.descending("ventaTotal")).limit(3);
+      for (Document document : findIterable) {
+        System.out.println(document);
+      }
+      // informacion.setText("holi, gracias por dar clic");
     }
 
   }

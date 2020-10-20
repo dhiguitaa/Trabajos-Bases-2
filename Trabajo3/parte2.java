@@ -16,6 +16,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 
 import java.awt.FlowLayout;
 import com.mongodb.client.MongoClients;
@@ -29,7 +30,7 @@ public class parte2 implements ActionListener {
   JButton extraer, visualizar;
   JLabel informacion;
   JFrame jf = new JFrame("Formulario");
-
+  JFrame datos;
   public parte2() {
 
     jf.setLayout(new FlowLayout());
@@ -44,7 +45,7 @@ public class parte2 implements ActionListener {
     jf.add(informacion);
     jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);// finaliza el programa cuando se da click en la X
     jf.setResizable(false);// para configurar si se redimensiona la ventana
-    jf.setSize(600, 600);// configurando tamaño de la ventana (ancho, alto)
+    jf.setSize(600, 300);// configurando tamaño de la ventana (ancho, alto)
     jf.setVisible(true);
   }
 
@@ -212,6 +213,8 @@ public class parte2 implements ActionListener {
       }
     }
     if(e.getSource() == visualizar){
+
+      
       MongoClient mongoClient = MongoClients.create("mongodb://127.0.0.1:27017");
       MongoDatabase db = mongoClient.getDatabase("parte2");
       MongoCollection<Document> marca = db.getCollection("marca");
@@ -223,85 +226,69 @@ public class parte2 implements ActionListener {
       MongoCollection<Document> ciudad = db.getCollection("ciudad");
       MongoCollection<Document> sucursal = db.getCollection("sucursal");
       // marca
-      System.out.println("marca");
       FindIterable<Document> elementosMarca = marca.find().sort(Sorts.descending("ventaTotal")).limit(3);
+      String resultado = "Marca: \n";
       for (Document document : elementosMarca) {
-        String resultado = "";
         resultado+="nombre: "+document.get("nombre");
         resultado+=", descripcion: "+document.get("descripcion");
-        resultado+=", ventas totales: "+document.get("ventaTotal");
-        System.out.println(resultado);
+        resultado+=", ventas totales: "+document.get("ventaTotal")+"\n";
       }
       //producto
-      System.out.println("producto");
+      resultado += "Producto: \n";
       FindIterable<Document> elementosProducto = producto.find().sort(Sorts.descending("ventaTotal")).limit(3);
       for (Document document : elementosProducto) {
-        String resultado = "";
         resultado+="nombre: "+document.get("nombre");
         resultado+=", codbarras: "+document.get("codbarras");
-        resultado+=", ventas totales: "+document.get("ventaTotal");
-        System.out.println(resultado);
+        resultado+=", ventas totales: "+document.get("ventaTotal")+"\n";
       }
       //gremio
-      System.out.println("gremio");
+      resultado += "Gremio: \n";
       FindIterable<Document> elementosGremio = gremio.find().sort(Sorts.descending("ventaTotal")).limit(3);
       for (Document document : elementosGremio) {
-        String resultado = "";
         resultado+="nombre: "+document.get("nombre");
         resultado+=", codigo: "+document.get("codigo");
-        resultado+=", ventas totales: "+document.get("ventaTotal");
-        System.out.println(resultado);
+        resultado+=", ventas totales: "+document.get("ventaTotal")+"\n";
       }
       //Vendedor
-      System.out.println("vendedor");
+      resultado += "Vendedor: \n";
       FindIterable<Document> elementosVendedor = vendedor.find().sort(Sorts.descending("ventaTotal")).limit(3);
       for (Document document : elementosVendedor) {
-        String resultado = "";
         resultado+="nombre: "+document.get("nombre");
         resultado+=", codigo: "+document.get("codigo");
-        resultado+=", ventas totales: "+document.get("ventaTotal");
-        System.out.println(resultado);
+        resultado+=", ventas totales: "+document.get("ventaTotal")+"\n";
       }
       //Pais
-      System.out.println("pais");
+      resultado += "Pais: \n";
       FindIterable<Document> elementosPais = pais.find().sort(Sorts.descending("ventaTotal")).limit(3);
       for (Document document : elementosPais) {
-        String resultado = "";
         resultado+="nombre: "+document.get("nombre");
-        resultado+=", ventas totales: "+document.get("ventaTotal");
-        System.out.println(resultado);
+        resultado+=", ventas totales: "+document.get("ventaTotal")+"\n";
       }
       //Dpto
-      System.out.println("dpto");
+      resultado += "Departamento: \n";
       FindIterable<Document> elementosDpto = dpto.find().sort(Sorts.descending("ventaTotal")).limit(3);
       for (Document document : elementosDpto) {
-        String resultado = "";
         resultado+="nombre: "+document.get("nombre");
         resultado+=", codigo: "+document.get("codigo");
-        resultado+=", ventas totales: "+document.get("ventaTotal");
-        System.out.println(resultado);
+        resultado+=", ventas totales: "+document.get("ventaTotal")+"\n";
       }
       //Ciudad
-      System.out.println("ciudad");
+      resultado += "Ciudad: \n";
       FindIterable<Document> elementosCiudad = ciudad.find().sort(Sorts.descending("ventaTotal")).limit(3);
       for (Document document : elementosCiudad) {
-        String resultado = "";
         resultado+="nombre: "+document.get("nombre");
         resultado+=", codigo: "+document.get("codigo");
-        resultado+=", ventas totales: "+document.get("ventaTotal");
-        System.out.println(resultado);
+        resultado+=", ventas totales: "+document.get("ventaTotal")+"\n";
       }
       //Sucursal
-      System.out.println("sucursal");
+      resultado += "Sucursal: \n";
       FindIterable<Document> elementosSucursal = sucursal.find().sort(Sorts.descending("ventaTotal")).limit(3);
       for (Document document : elementosSucursal) {
-        String resultado = "";
         resultado+="nombre: "+document.get("nombre");
         resultado+=", codigo: "+document.get("codigo");
-        resultado+=", ventas totales: "+document.get("ventaTotal");
-        System.out.println(resultado);
+        resultado+=", ventas totales: "+document.get("ventaTotal")+"\n";
       }
-      
+      JOptionPane.showMessageDialog(null, resultado );
     }
 
   }

@@ -182,7 +182,7 @@ public class parte2 implements ActionListener {
             "SELECT producto.codbarras as producto, producto.nombre as nombre,sum(venta.valor) as ventas FROM ((marca full outer JOIN producto ON marca.nombre=producto.nombreMarca)full outer join venta on producto.codbarras=venta.codbarrasProducto) group by producto.codbarras, producto.nombre");
 
         while (resultado.next()) {
-          Document document = new Document("codigo", resultado.getString("producto"));
+          Document document = new Document("codbarras", resultado.getString("producto"));
           document.append("nombre", resultado.getString("nombre"));
           if(Objects.isNull(resultado.getString("ventas"))){
             document.append("ventaTotal", 0);

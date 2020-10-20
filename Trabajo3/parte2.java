@@ -294,10 +294,6 @@ public class parte2 implements ActionListener {
   }
 
   public static void main(String[] args) {
-    // MongoClient mongoClient = MongoClients.create("mongodb://127.0.0.1:27017");
-    // MongoDatabase db = mongoClient.getDatabase("tienda");
-    // for (String name : db.listCollectionNames()) {
-    // System.out.println(name);
     parte2 gj = new parte2();
   }
 

@@ -1,392 +1,300 @@
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-// import java.awt.Insets;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoClient;
+import com.mongodb.MongoClientSettings;
+import com.mongodb.ConnectionString;
+import com.mongodb.ServerAddress;
+import com.mongodb.MongoCredential;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Sorts;
+
+import java.util.Arrays;
+import java.util.*;
+import java.sql.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-// import javax.swing.JOptionPane;
+import javax.swing.JOptionPane;
 
-// import java.sql.*;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.*;
-import java.awt.*;
-// import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.BorderFactory;
-import javax.swing.border.Border;
+import java.awt.FlowLayout;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
 
+public class punto2 implements ActionListener {
 
-public class punto2 extends JFrame implements ActionListener{//implementando el listener de eventos
-    
-JLabel t1, t2, t3, at1, at2, at3, s12,s13, s3;
-JTextField text1, text2, text3, text4, text5,text6;
-JButton boton1;
-JTextArea text7,text8, text9;
-JPanel panel;
-  Border border;
-  public punto2(){//constructor de la clase  
+  JButton extraer, visualizar;
+  JLabel informacion;
+  JFrame jf = new JFrame("Formulario");
+  JFrame datos;
+  public punto2() {
 
-    t1 = new JLabel("T1");
-    t1.setBounds(10,0,80,40);
+    jf.setLayout(new FlowLayout());
+    extraer = new JButton("Generar y cargar estadisticas");
+    visualizar = new JButton("Visualizar estadisticas");
+    informacion = new JLabel();
+    extraer.addActionListener(this);
+    visualizar.addActionListener(this);
 
-    t2 = new JLabel("T2");
-    t2.setBounds(10,50,80,40);
+    jf.add(extraer);
+    jf.add(visualizar);
+    jf.add(informacion);
+    jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);// finaliza el programa cuando se da click en la X
+    jf.setResizable(false);// para configurar si se redimensiona la ventana
+    jf.setSize(600, 300);// configurando tamaño de la ventana (ancho, alto)
+    jf.setVisible(true);
+  }
 
-    t3 = new JLabel("T3");
-    t3.setBounds(10,100,80,40);
+  public void actionPerformed(final ActionEvent e) {
 
-    at1 = new JLabel("Atributos T1");
-    at1.setBounds(10,150,80,40);
+    if (e.getSource() == extraer) {
 
-    at2 = new JLabel("Atributos T2");
-    at2.setBounds(10,200,80,40);
+      Connection conn;
+      Statement sentencia;
+      ResultSet resultado;
+      MongoClient mongoClient = MongoClients.create("mongodb://127.0.0.1:27017");
+      MongoDatabase db = mongoClient.getDatabase("parte2");
+      MongoCollection<Document> marca = db.getCollection("marca");
+      MongoCollection<Document> producto = db.getCollection("producto");
+      MongoCollection<Document> gremio = db.getCollection("gremio");
+      MongoCollection<Document> vendedor = db.getCollection("vendedor");
+      MongoCollection<Document> pais = db.getCollection("pais");
+      MongoCollection<Document> dpto = db.getCollection("dpto");
+      MongoCollection<Document> ciudad = db.getCollection("ciudad");
+      MongoCollection<Document> sucursal = db.getCollection("sucursal");
+      marca.drop();
+      producto.drop();
+      gremio.drop();
+      vendedor.drop();
+      pais.drop();
+      dpto.drop();
+      ciudad.drop();
+      sucursal.drop();
+      try { // Se carga el driver JDBC-ODBC
+        Class.forName("oracle.jdbc.driver.OracleDriver");
+      } catch (final Exception err) {
+        System.out.println("No se pudo cargar el driver JDBC");
+        return;
+      }
 
-    at3 = new JLabel("Atributos T3");
-    at3.setBounds(10,250,80,40);
+      try { // Se establece la conexi�n con la base de datos Oracle Express
+        conn = DriverManager.getConnection("jdbc:oracle:thin:@DESKTOP-LV4ONBF:1521:xe", "dani", "dani");
+        sentencia = conn.createStatement();
+      } catch (final SQLException err) {
+        System.out.println("No hay conexi�n con la base de datos.");
+        return;
+      }
 
-    s12 = new JLabel("Consultas S1 (T2)");
-    s12.setBounds(10,300,100,40);
+      try {
+        // ventas totales por sucursal
+        resultado = sentencia.executeQuery(
+            "SELECT sucursal.codigo as sucursal, sucursal.nombre as nombre, sum(venta.valor) as ventas FROM ((((pais full outer JOIN dpto ON pais.nombre=dpto.nombrePais)full outer join ciudad on dpto.codigo=ciudad.codigoDpto)full outer join sucursal on ciudad.codigo=sucursal.codigoCiudad)full outer join venta on sucursal.codigo=venta.codigoSucursal) group by sucursal.codigo, sucursal.nombre");
 
-    s13 = new JLabel("Consultas S1 (T3)");
-    s13.setBounds(690,300,100,40);
+        while (resultado.next()) {
+          Document document = new Document("codigo", resultado.getString("sucursal"));
+          document.append("nombre", resultado.getString("nombre"));
+          if(Objects.isNull(resultado.getString("ventas"))){
+            document.append("ventaTotal", 0);
+          }else{
+            document.append("ventaTotal", Integer.parseInt(resultado.getString("ventas")));
+          }
+          sucursal.insertOne(document);
+        }
+        // ventas totales por ciudad
+        resultado = sentencia.executeQuery(
+            "SELECT ciudad.codigo as ciudad, ciudad.nombre as nombre,sum(venta.valor) as ventas FROM ((((pais full outer JOIN dpto ON pais.nombre=dpto.nombrePais)full outer join ciudad on dpto.codigo=ciudad.codigoDpto)full outer join sucursal on ciudad.codigo=sucursal.codigoCiudad)full outer join venta on sucursal.codigo=venta.codigoSucursal) group by ciudad.codigo,ciudad.nombre");
 
-    s3 = new JLabel("Consultas S3");
-    s3.setBounds(10,460,80,40);
-    
-    text1 = new JTextField();
-    text1.setBounds(100,5,550,40);
+        while (resultado.next()) {
+          Document document = new Document("codigo", resultado.getString("ciudad"));
+          document.append("nombre", resultado.getString("nombre"));
+          if(Objects.isNull(resultado.getString("ventas"))){
+            document.append("ventaTotal", 0);
+          }else{
+            document.append("ventaTotal", Integer.parseInt(resultado.getString("ventas")));
+          }
+          ciudad.insertOne(document);
+        }
+        // ventas totales por dpto
+        resultado = sentencia.executeQuery(
+            "SELECT dpto.codigo as dpto,dpto.nombre as nombre,sum(venta.valor) as ventas FROM ((((pais full outer JOIN dpto ON pais.nombre=dpto.nombrePais) full outer join ciudad on dpto.codigo=ciudad.codigoDpto)full outer join sucursal on ciudad.codigo=sucursal.codigoCiudad)full outer join venta on sucursal.codigo=venta.codigoSucursal) group by dpto.codigo,dpto.nombre");
 
-    text2 = new JTextField();
-    text2.setBounds(100,50,550,40);
+        while (resultado.next()) {
+          Document document = new Document("codigo", resultado.getString("dpto"));
+          document.append("nombre", resultado.getString("nombre"));
+          if(Objects.isNull(resultado.getString("ventas"))){
+            document.append("ventaTotal", 0);
+          }else{
+            document.append("ventaTotal", Integer.parseInt(resultado.getString("ventas")));
+          }
+          dpto.insertOne(document);
+        }
+        // ventas totales por pais
+        resultado = sentencia.executeQuery(
+            "SELECT pais.nombre as pais,sum(venta.valor) as ventas FROM ((((pais full outer JOIN dpto ON pais.nombre=dpto.nombrePais)full outer join ciudad on dpto.codigo=ciudad.codigoDpto)full outer join sucursal on ciudad.codigo=sucursal.codigoCiudad)full outer join venta on sucursal.codigo=venta.codigoSucursal)group by pais.nombre");
 
-    text3 = new JTextField();
-    text3.setBounds(100,100,550,40);
+        while (resultado.next()) {
+          Document document = new Document("nombre", resultado.getString("pais"));
+          
+          if(Objects.isNull(resultado.getString("ventas"))){
+            document.append("ventaTotal", 0);
+          }else{
+            document.append("ventaTotal", Integer.parseInt(resultado.getString("ventas")));
+          }
+          pais.insertOne(document);
+        }
+        System.out.println("--");
+        // ventas totales por vendedor
+        resultado = sentencia.executeQuery(
+            "SELECT vendedor.codigo as vendedor, vendedor.nombre as nombre, sum(venta.valor) as ventas FROM ((gremio full outer JOIN vendedor ON gremio.codigo=vendedor.codigoGremio)full outer join venta on vendedor.codigo=venta.codigoVendedor) group by vendedor.codigo,vendedor.nombre");
 
-    text4 = new JTextField();
-    text4.setBounds(100,150,550,40);
+        while (resultado.next()) {
+          Document document = new Document("codigo", resultado.getString("vendedor"));
+          document.append("nombre", resultado.getString("nombre"));
+          if(Objects.isNull(resultado.getString("ventas"))){
+            document.append("ventaTotal", 0);
+          }else{
+            document.append("ventaTotal", Integer.parseInt(resultado.getString("ventas")));
+          }
+          vendedor.insertOne(document);
+        }
 
-    text5 = new JTextField();
-    text5.setBounds(100,200,550,40);
+        // ventas totales por gremio
+        resultado = sentencia.executeQuery(
+            "SELECT gremio.codigo as gremio, gremio.nombre as nombre, sum(venta.valor) as ventas FROM ((gremio full outer JOIN vendedor ON gremio.codigo=vendedor.codigoGremio)full outer join venta on vendedor.codigo=venta.codigoVendedor)group by gremio.codigo, gremio.nombre");
 
-    text6 = new JTextField();
-    text6.setBounds(100,250,550,40);
+        while (resultado.next()) {
+          Document document = new Document("codigo", resultado.getString("gremio"));
+          document.append("nombre", resultado.getString("nombre"));
+          if(Objects.isNull(resultado.getString("ventas"))){
+            document.append("ventaTotal", 0);
+          }else{
+            document.append("ventaTotal", Integer.parseInt(resultado.getString("ventas")));
+          }
+          gremio.insertOne(document);
+        }
+        System.out.println("--");
+        // ventas totales por producto
+        resultado = sentencia.executeQuery(
+            "SELECT producto.codbarras as producto, producto.nombre as nombre,sum(venta.valor) as ventas FROM ((marca full outer JOIN producto ON marca.nombre=producto.nombreMarca)full outer join venta on producto.codbarras=venta.codbarrasProducto) group by producto.codbarras, producto.nombre");
 
-    text7 = new JTextArea();
-    text7.setBounds(120,300,550,170);
+        while (resultado.next()) {
+          Document document = new Document("codbarras", resultado.getString("producto"));
+          document.append("nombre", resultado.getString("nombre"));
+          if(Objects.isNull(resultado.getString("ventas"))){
+            document.append("ventaTotal", 0);
+          }else{
+            document.append("ventaTotal", Integer.parseInt(resultado.getString("ventas")));
+          }
+          producto.insertOne(document);
+        }
+        System.out.println("--");
+        // ventas totales por marca
+        resultado = sentencia.executeQuery(
+            "SELECT marca.nombre as marca, marca.descripcion as descripcion, sum(venta.valor) as ventas FROM ((marca full outer JOIN producto ON marca.nombre=producto.nombreMarca)full outer join venta on producto.codbarras=venta.codbarrasProducto) group by marca.nombre,marca.descripcion");
 
-    text8 = new JTextArea();
-    text8.setBounds(800,300,550,170);
+        while (resultado.next()) {
+          Document document = new Document("nombre", resultado.getString("marca"));
+          document.append("descripcion", resultado.getString("descripcion"));
+          if(Objects.isNull(resultado.getString("ventas"))){
+            document.append("ventaTotal", 0);
+          }else{
+            document.append("ventaTotal", Integer.parseInt(resultado.getString("ventas")));
+          }
+          marca.insertOne(document);
+        }
 
-    text9 = new JTextArea();
-    text9.setBounds(100,480,550,170);
+      } catch (Exception err) {
+        System.out.println("error");
+        System.out.println(err);
+      }
+    }
+    if(e.getSource() == visualizar){
 
-    boton1 = new JButton();
-    boton1.setText("Aceptar");
-    boton1.setBounds(300,670,80,20);
-    boton1.addActionListener(this);
+      
+      MongoClient mongoClient = MongoClients.create("mongodb://127.0.0.1:27017");
+      MongoDatabase db = mongoClient.getDatabase("parte2");
+      MongoCollection<Document> marca = db.getCollection("marca");
+      MongoCollection<Document> producto = db.getCollection("producto");
+      MongoCollection<Document> gremio = db.getCollection("gremio");
+      MongoCollection<Document> vendedor = db.getCollection("vendedor");
+      MongoCollection<Document> pais = db.getCollection("pais");
+      MongoCollection<Document> dpto = db.getCollection("dpto");
+      MongoCollection<Document> ciudad = db.getCollection("ciudad");
+      MongoCollection<Document> sucursal = db.getCollection("sucursal");
+      // marca
+      FindIterable<Document> elementosMarca = marca.find().sort(Sorts.descending("ventaTotal")).limit(3);
+      String resultado = "Marca: \n";
+      for (Document document : elementosMarca) {
+        resultado+="nombre: "+document.get("nombre");
+        resultado+=", descripcion: "+document.get("descripcion");
+        resultado+=", ventas totales: "+document.get("ventaTotal")+"\n";
+      }
+      //producto
+      resultado += "Producto: \n";
+      FindIterable<Document> elementosProducto = producto.find().sort(Sorts.descending("ventaTotal")).limit(3);
+      for (Document document : elementosProducto) {
+        resultado+="nombre: "+document.get("nombre");
+        resultado+=", codbarras: "+document.get("codbarras");
+        resultado+=", ventas totales: "+document.get("ventaTotal")+"\n";
+      }
+      //gremio
+      resultado += "Gremio: \n";
+      FindIterable<Document> elementosGremio = gremio.find().sort(Sorts.descending("ventaTotal")).limit(3);
+      for (Document document : elementosGremio) {
+        resultado+="nombre: "+document.get("nombre");
+        resultado+=", codigo: "+document.get("codigo");
+        resultado+=", ventas totales: "+document.get("ventaTotal")+"\n";
+      }
+      //Vendedor
+      resultado += "Vendedor: \n";
+      FindIterable<Document> elementosVendedor = vendedor.find().sort(Sorts.descending("ventaTotal")).limit(3);
+      for (Document document : elementosVendedor) {
+        resultado+="nombre: "+document.get("nombre");
+        resultado+=", codigo: "+document.get("codigo");
+        resultado+=", ventas totales: "+document.get("ventaTotal")+"\n";
+      }
+      //Pais
+      resultado += "Pais: \n";
+      FindIterable<Document> elementosPais = pais.find().sort(Sorts.descending("ventaTotal")).limit(3);
+      for (Document document : elementosPais) {
+        resultado+="nombre: "+document.get("nombre");
+        resultado+=", ventas totales: "+document.get("ventaTotal")+"\n";
+      }
+      //Dpto
+      resultado += "Departamento: \n";
+      FindIterable<Document> elementosDpto = dpto.find().sort(Sorts.descending("ventaTotal")).limit(3);
+      for (Document document : elementosDpto) {
+        resultado+="nombre: "+document.get("nombre");
+        resultado+=", codigo: "+document.get("codigo");
+        resultado+=", ventas totales: "+document.get("ventaTotal")+"\n";
+      }
+      //Ciudad
+      resultado += "Ciudad: \n";
+      FindIterable<Document> elementosCiudad = ciudad.find().sort(Sorts.descending("ventaTotal")).limit(3);
+      for (Document document : elementosCiudad) {
+        resultado+="nombre: "+document.get("nombre");
+        resultado+=", codigo: "+document.get("codigo");
+        resultado+=", ventas totales: "+document.get("ventaTotal")+"\n";
+      }
+      //Sucursal
+      resultado += "Sucursal: \n";
+      FindIterable<Document> elementosSucursal = sucursal.find().sort(Sorts.descending("ventaTotal")).limit(3);
+      for (Document document : elementosSucursal) {
+        resultado+="nombre: "+document.get("nombre");
+        resultado+=", codigo: "+document.get("codigo");
+        resultado+=", ventas totales: "+document.get("ventaTotal")+"\n";
+      }
+      JOptionPane.showMessageDialog(null, resultado );
+    }
 
-    panel=new JPanel();
-    panel.setLayout(null);
-    panel.add(t1);
-    panel.add(t2);
-    panel.add(t3);
-    panel.add(at1);
-    panel.add(at2);
-    panel.add(at3);
-    panel.add(s12);
-    panel.add(s13);
-    panel.add(s3);
-    panel.add(text1);
-    panel.add(text2);
-    panel.add(text3);
-    panel.add(text4);
-    panel.add(text5);
-    panel.add(text6);
-    panel.add(text7);
-    panel.add(text8);
-    panel.add(text9);
-    panel.add(boton1);
-   
-
-    add(panel);
-    setTitle("Formulario");
-    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    setSize(800,900);
-    setVisible(true);
-              
   }
 
   public static void main(String[] args) {
-  punto2 gj = new punto2();//uso de constructor para la ventana
+    punto2 gj = new punto2();
   }
 
-  @Override
-  public void actionPerformed(final ActionEvent e) {// sobreescribimos el metgetLocaleso del listener
-
-    // variables que almacenaran los textos de los campos de texto
-    List<String> atributosT1 = new ArrayList<String>();
-    List<String> atributosT2 = new ArrayList<String>();
-    List<String> atributosT3 = new ArrayList<String>();
-    List<List<String>> atributosS12 = new ArrayList<List<String>>();
-    List<List<String>> atributosS13 = new ArrayList<List<String>>();
-    List<List<String>> atributosS3 = new ArrayList<List<String>>();
-
-    
-    
-    String nombreT1 = text1.getText().toUpperCase();
-    String nombreT2 = text2.getText().toUpperCase();
-    String nombreT3 = text3.getText().toUpperCase();
-    String atrT1 = text4.getText();
-    String atrT2 = text5.getText();
-    String atrT3 = text6.getText();
-    String atrS12 = text7.getText();
-    String atrS13 = text8.getText();
-    String atrS3 = text9.getText();
-    String[] splitT1= atrT1.split(",");
-    String[] splitT2= atrT2.split(",");
-    String[] splitT3= atrT3.split(",");
-    String[] splitS12= atrS12.split("\n");
-    String[] splitS13= atrS13.split("\n");
-    String[] splitS3= atrS3.split("\n");
-    for (int i = 0; i < splitT1.length; i++) {
-      atributosT1.add(splitT1[i].trim().toLowerCase());
-    }
-    for (int i = 0; i < splitT2.length; i++) {
-      atributosT2.add(splitT2[i].trim().toLowerCase());
-    }
-    for (int i = 0; i < splitT3.length; i++) {
-        atributosT3.add(splitT3[i].trim().toLowerCase());
-    }
-
-    String clave =  " ";
-    for (int i = 0; i < splitT1.length; i++){
-        for (int j = 0; j <splitT2.length; j++){
-          if(splitT2[j].equals(splitT1[i])){
-            clave = splitT1[i];
-            break;
-          }
-        }
-    }
-
-    //Creando S12 y S13 
-    for (int i = 0; i < splitS12.length; i++) {
-      String palabra = " ";
-      for (int l = 0; l < splitT2.length; l++) {
-        if (splitS12[i].contains(splitT2[l]) && (splitT2[l].equals(clave))== false) {
-            palabra += splitT2[l] +  "," ;
-        }
-      }
-      if (!(palabra.equals(" "))) {
-        String[] conjunto = palabra.split(",");
-        atributosS12.add(new ArrayList<String>());
-        for (int j = 0; j < conjunto.length; j++) {
-          atributosS12.get(i).add(conjunto[j].trim().toLowerCase());
-        }
-      }
-    }
-
-    for (int i = 0; i < splitS13.length; i++) {
-      String palabra = " ";
-      for (int l = 0; l < splitT3.length; l++) {
-        if (splitS12[i].contains(splitT3[l]) && (splitT3[l].equals(clave))== false) {
-            palabra += splitT3[l] +  "," ;
-        }
-      }
-      if (!(palabra.equals(" "))) {
-        String[] conjunto = palabra.split(",");
-        atributosS13.add(new ArrayList<String>());
-        for (int j = 0; j < conjunto.length; j++) {
-          atributosS13.get(i).add(conjunto[j].trim().toLowerCase());
-        }
-      }
-    }
-
-    //Creando S3
-
-    for (int i = 0; i < splitS3.length; i++) {
-      String palabra = " ";
-      for (int l = 0; l < splitT2.length; l++) {
-        if (splitS3[i].contains(splitT2[l]) && (splitT2[l].equals(clave))== false) {
-            palabra += splitT2[l] +  "," ;
-        }
-      }
-      for (int l = 0; l < splitT3.length; l++) {
-        if (splitS3[i].contains(splitT3[l]) && (splitT3[l].equals(clave))== false) {
-            palabra += splitT3[l] +  "," ;
-        }
-      }
-      String[] conjunto = palabra.split(",");
-      atributosS3.add(new ArrayList<String>());
-      for (int j = 0; j < conjunto.length; j++) {
-          atributosS3.get(i).add(conjunto[j].trim().toLowerCase());
-      }
-    }
-
-    System.out.println("atributosS3");
-    System.out.println(atributosS3);
-
-    //Unir S3
-    Set <String> set = new HashSet <String>();
-    for (int i = 0; i < atributosS3.size(); i++){
-        set.addAll(atributosS3.get(i));
-    }
-
-    List<String> ConjS3 = new ArrayList<String>(set);
-
-    //regla
-    //todo lo de t2 que esta en s3
-    List<String> tprima2s3 = new ArrayList<String>();
-    List<String> tprima2 = new ArrayList<String>();
-    List<String> tdoblePrima2 = new ArrayList<String>();
-    for (int i = 0; i < ConjS3.size(); i++) {
-      String atributo = ConjS3.get(i);
-      if (atributosT2.indexOf(atributo)>=0) {
-        tprima2s3.add(atributo);
-        tprima2.add(atributo);
-      } 
-    }
-
-    System.out.println("tprima2s3");
-    System.out.println(tprima2s3);
-
-    //creacion de t'2 y t''2 definitivas
-    for (int i = 0; i < atributosS12.size(); i++) {
-      List<String> conjunto = atributosS12.get(i);
-      int elementosBorrados = 0;
-      //resta
-
-
-      for (int j = 0; j < conjunto.size(); j++) {
-        if (tprima2s3.indexOf(conjunto.get(j)) >= 0){
-          conjunto.remove(j);
-          elementosBorrados ++;
-        } 
-      }
-      
-      //vacio o igual a s1
-      if (conjunto.size()!=0 && elementosBorrados != 0) {
-        for (int j = 0; j < conjunto.size(); j++) {
-          if (tprima2.indexOf(conjunto.get(j)) <  0){
-            tprima2.add(conjunto.get(j));
-          } 
-        }
-      }
-      //interseccion S1i con t'2
-      if(elementosBorrados == 0){
-        for (int j = 0; j < conjunto.size(); j++) {
-          if ((tdoblePrima2.indexOf(conjunto.get(j)) <  0) && (atributosT2.indexOf(conjunto.get(j)) >=  0) ){
-            tdoblePrima2.add(conjunto.get(j));
-          } 
-        }
-      }
-    }
-
-    System.out.println("tprima2");
-    System.out.println(tprima2);
-    System.out.println("tdoblePrima2");
-    System.out.println(tdoblePrima2);
-
-    //regla
-    //todo lo de t3 que esta en s3
-    List<String> tprima3s3 = new ArrayList<String>();
-    List<String> tprima3 = new ArrayList<String>();
-    List<String> tdoblePrima3 = new ArrayList<String>();
-    for (int i = 0; i < ConjS3.size(); i++) {
-      String atributo = ConjS3.get(i);
-      if (atributosT3.indexOf(atributo)>=0) {
-        tprima3s3.add(atributo);
-        tprima3.add(atributo);
-      } 
-    }
-
-    System.out.println("tprima3s3");
-    System.out.println(tprima3s3);
-
-    //creacion de t'3 y t''3 definitivas
-    for (int i = 0; i < atributosS13.size(); i++) {
-      List<String> conjunto = atributosS13.get(i);
-      int elementosBorrados = 0;
-      //resta
-
-
-      for (int j = 0; j < conjunto.size(); j++) {
-        if (tprima3s3.indexOf(conjunto.get(j)) >= 0){
-          conjunto.remove(j);
-          elementosBorrados ++;
-        } 
-      }
-      
-      //vacio o igual a s1
-      if (conjunto.size()!=0 && elementosBorrados != 0) {
-        for (int j = 0; j < conjunto.size(); j++) {
-          if (tprima3.indexOf(conjunto.get(j)) <  0){
-            tprima3.add(conjunto.get(j));
-          } 
-        }
-      }
-      //interseccion S1i con t'3
-      if(elementosBorrados == 0){
-        for (int j = 0; j < conjunto.size(); j++) {
-          if ((tdoblePrima3.indexOf(conjunto.get(j)) <  0) && (atributosT3.indexOf(conjunto.get(j)) >=  0)){
-            tdoblePrima3.add(conjunto.get(j));
-          } 
-        }
-      }
-    }
-
-    System.out.println("tprima3");
-    System.out.println(tprima3);
-
-    System.out.println("tdoblePrima3");
-    System.out.println(tdoblePrima3);
-
-
-    //creación de 
-    //Q'={todo lo de t1,t'2:{sus cosas},t''2:{sus cosas}, t'3: {sus cosas}, t''3:{sus cosas}}
-
-    String qprima = "Q'={";
-
-    for (int i = 0; i < atributosT1.size(); i++) {
-      qprima += atributosT1.get(i)+", ";
-    }
-    qprima += nombreT2+"_of_"+nombreT1+": {";
-    for (int i = 0; i < tprima2.size(); i++) {
-      qprima += tprima2.get(i)+", ";
-    }
-    
-    qprima = qprima.substring(0, qprima.length()-2);
-    qprima += "}";
-    if(tdoblePrima2.size() != 0){
-      qprima += ", T''2: {";
-      for (int i = 0; i < tdoblePrima2.size(); i++) {
-        qprima += tdoblePrima2.get(i)+", ";
-      }
-      qprima = qprima.substring(0, qprima.length()-2);
-      qprima += "} ,";
-    }
-    qprima += nombreT3+"_of_"+nombreT1+": {";
-    for (int i = 0; i < tprima3.size(); i++) {
-      qprima += tprima3.get(i)+", ";
-    }
-    
-    qprima = qprima.substring(0, qprima.length()-2);
-    qprima += "}";
-    if(tdoblePrima3.size() != 0){
-      qprima += ", T''3: {";
-      for (int i = 0; i < tdoblePrima3.size(); i++) {
-        qprima += tdoblePrima3.get(i)+", ";
-      }
-      qprima = qprima.substring(0, qprima.length()-2);
-      qprima += "}";
-    }
-    qprima += "}";
-    
-    System.out.println(qprima);
-  }      
 }

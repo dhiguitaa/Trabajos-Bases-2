@@ -164,3 +164,11 @@ FROM ((marca
 full outer JOIN producto ON marca.nombre=producto.nombreMarca)
 full outer join venta on producto.codbarras=venta.codbarrasProducto)
 group by marca.nombre;
+
+INSERT INTO pais VALUES('colombia','cop');
+INSERT INTO pais VALUES('ecuador','dolar');
+
+INSERT INTO dpto VALUES(501,'colombia','antioquia');
+INSERT INTO dpto VALUES(502,'colombia','santander');
+INSERT INTO dpto VALUES(503,'ecuador','chimborazo');
+INSERT INTO dpto VALUES(504,'ecuador','imbabura');

@@ -6,6 +6,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JOptionPane;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -390,5 +391,6 @@ JPanel panel;
     qprima += "}";
     
     System.out.println(qprima);
+    JOptionPane.showMessageDialog(null, qprima );
   }      
 }

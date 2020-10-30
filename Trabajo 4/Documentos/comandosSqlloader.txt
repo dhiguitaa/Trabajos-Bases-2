@@ -1,0 +1,3 @@
+sqlldr control='bloques.ctl' data='MuestraBloques.csv' log='bloque.log'
+
+sqlldr control='transacciones.ctl' data='MuestraTransacciones.csv' log='transaccion.log'

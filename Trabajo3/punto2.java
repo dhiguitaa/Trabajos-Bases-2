@@ -314,7 +314,7 @@ public class punto2 implements ActionListener {
   }
 
   public static void main(String[] args) {
-    punto2 gj = new punto2();
+    parte1p2 gj = new parte1p2();
   }
 
 }

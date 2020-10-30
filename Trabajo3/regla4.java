@@ -141,246 +141,253 @@ public class regla4 extends JFrame implements ActionListener{//implementando el 
     String atrS12 = text7.getText();
     String atrS13 = text8.getText();
     String atrS3 = text9.getText();
-    String[] splitT1= atrT1.split(",");
-    String[] splitT2= atrT2.split(",");
-    String[] splitT3= atrT3.split(",");
-    String[] splitS12= atrS12.split("\n");
-    String[] splitS13= atrS13.split("\n");
-    String[] splitS3= atrS3.split("\n");
-    for (int i = 0; i < splitT1.length; i++) {
-      atributosT1.add(splitT1[i].trim().toLowerCase());
-    }
-    for (int i = 0; i < splitT2.length; i++) {
-      atributosT2.add(splitT2[i].trim().toLowerCase());
-    }
-    for (int i = 0; i < splitT3.length; i++) {
-        atributosT3.add(splitT3[i].trim().toLowerCase());
-    }
+      
+    if (nombreT1.trim().equals("") || nombreT2.trim().equals("") || nombreT3.trim().equals("") || atrT1.trim().equals("") || atrT2.trim().equals("") || atrT3.trim().equals("")){
+        String texto = "Error. Recuerde que los campos de los nombres y atributos de cada tabla no pueden ser vacios";
+        JOptionPane.showMessageDialog(null, texto);
+    }else{
+        
+        String[] splitT1= atrT1.split(",");
+        String[] splitT2= atrT2.split(",");
+        String[] splitT3= atrT3.split(",");
+        String[] splitS12= atrS12.split("\n");
+        String[] splitS13= atrS13.split("\n");
+        String[] splitS3= atrS3.split("\n");
+        for (int i = 0; i < splitT1.length; i++) {
+          atributosT1.add(splitT1[i].trim().toLowerCase());
+        }
+        for (int i = 0; i < splitT2.length; i++) {
+          atributosT2.add(splitT2[i].trim().toLowerCase());
+        }
+        for (int i = 0; i < splitT3.length; i++) {
+            atributosT3.add(splitT3[i].trim().toLowerCase());
+        }
 
-    String clave =  " ";
-    for (int i = 0; i < splitT1.length; i++){
-        for (int j = 0; j <splitT2.length; j++){
-          if(splitT2[j].equals(splitT1[i])){
-            clave = splitT1[i];
-            break;
+        String clave =  " ";
+        for (int i = 0; i < splitT1.length; i++){
+            for (int j = 0; j <splitT2.length; j++){
+              if(splitT2[j].equals(splitT1[i])){
+                clave = splitT1[i];
+                break;
+              }
+            }
+        }
+
+        //Creando S12 y S13 
+        for (int i = 0; i < splitS12.length; i++) {
+          String palabra = " ";
+          for (int l = 0; l < splitT2.length; l++) {
+            if (splitS12[i].contains(splitT2[l]) && (splitT2[l].equals(clave))== false) {
+                palabra += splitT2[l] +  "," ;
+            }
+          }
+          if (!(palabra.equals(" "))) {
+            String[] conjunto = palabra.split(",");
+            atributosS12.add(new ArrayList<String>());
+            for (int j = 0; j < conjunto.length; j++) {
+              atributosS12.get(i).add(conjunto[j].trim().toLowerCase());
+            }
           }
         }
-    }
 
-    //Creando S12 y S13 
-    for (int i = 0; i < splitS12.length; i++) {
-      String palabra = " ";
-      for (int l = 0; l < splitT2.length; l++) {
-        if (splitS12[i].contains(splitT2[l]) && (splitT2[l].equals(clave))== false) {
-            palabra += splitT2[l] +  "," ;
+        for (int i = 0; i < splitS13.length; i++) {
+          String palabra = " ";
+          for (int l = 0; l < splitT3.length; l++) {
+            if (splitS12[i].contains(splitT3[l]) && (splitT3[l].equals(clave))== false) {
+                palabra += splitT3[l] +  "," ;
+            }
+          }
+          if (!(palabra.equals(" "))) {
+            String[] conjunto = palabra.split(",");
+            atributosS13.add(new ArrayList<String>());
+            for (int j = 0; j < conjunto.length; j++) {
+              atributosS13.get(i).add(conjunto[j].trim().toLowerCase());
+            }
+          }
         }
-      }
-      if (!(palabra.equals(" "))) {
-        String[] conjunto = palabra.split(",");
-        atributosS12.add(new ArrayList<String>());
-        for (int j = 0; j < conjunto.length; j++) {
-          atributosS12.get(i).add(conjunto[j].trim().toLowerCase());
+
+        //Creando S3
+
+        for (int i = 0; i < splitS3.length; i++) {
+          String palabra = " ";
+          for (int l = 0; l < splitT2.length; l++) {
+            if (splitS3[i].contains(splitT2[l]) && (splitT2[l].equals(clave))== false) {
+                palabra += splitT2[l] +  "," ;
+            }
+          }
+          for (int l = 0; l < splitT3.length; l++) {
+            if (splitS3[i].contains(splitT3[l]) && (splitT3[l].equals(clave))== false) {
+                palabra += splitT3[l] +  "," ;
+            }
+          }
+          String[] conjunto = palabra.split(",");
+          atributosS3.add(new ArrayList<String>());
+          for (int j = 0; j < conjunto.length; j++) {
+              atributosS3.get(i).add(conjunto[j].trim().toLowerCase());
+          }
         }
-      }
-    }
 
-    for (int i = 0; i < splitS13.length; i++) {
-      String palabra = " ";
-      for (int l = 0; l < splitT3.length; l++) {
-        if (splitS12[i].contains(splitT3[l]) && (splitT3[l].equals(clave))== false) {
-            palabra += splitT3[l] +  "," ;
+        System.out.println("atributosS3");
+        System.out.println(atributosS3);
+
+        //Unir S3
+        Set <String> set = new HashSet <String>();
+        for (int i = 0; i < atributosS3.size(); i++){
+            set.addAll(atributosS3.get(i));
         }
-      }
-      if (!(palabra.equals(" "))) {
-        String[] conjunto = palabra.split(",");
-        atributosS13.add(new ArrayList<String>());
-        for (int j = 0; j < conjunto.length; j++) {
-          atributosS13.get(i).add(conjunto[j].trim().toLowerCase());
-        }
-      }
-    }
 
-    //Creando S3
+        List<String> ConjS3 = new ArrayList<String>(set);
 
-    for (int i = 0; i < splitS3.length; i++) {
-      String palabra = " ";
-      for (int l = 0; l < splitT2.length; l++) {
-        if (splitS3[i].contains(splitT2[l]) && (splitT2[l].equals(clave))== false) {
-            palabra += splitT2[l] +  "," ;
-        }
-      }
-      for (int l = 0; l < splitT3.length; l++) {
-        if (splitS3[i].contains(splitT3[l]) && (splitT3[l].equals(clave))== false) {
-            palabra += splitT3[l] +  "," ;
-        }
-      }
-      String[] conjunto = palabra.split(",");
-      atributosS3.add(new ArrayList<String>());
-      for (int j = 0; j < conjunto.length; j++) {
-          atributosS3.get(i).add(conjunto[j].trim().toLowerCase());
-      }
-    }
-
-    System.out.println("atributosS3");
-    System.out.println(atributosS3);
-
-    //Unir S3
-    Set <String> set = new HashSet <String>();
-    for (int i = 0; i < atributosS3.size(); i++){
-        set.addAll(atributosS3.get(i));
-    }
-
-    List<String> ConjS3 = new ArrayList<String>(set);
-
-    //regla
-    //todo lo de t2 que esta en s3
-    List<String> tprima2s3 = new ArrayList<String>();
-    List<String> tprima2 = new ArrayList<String>();
-    List<String> tdoblePrima2 = new ArrayList<String>();
-    for (int i = 0; i < ConjS3.size(); i++) {
-      String atributo = ConjS3.get(i);
-      if (atributosT2.indexOf(atributo)>=0) {
-        tprima2s3.add(atributo);
-        tprima2.add(atributo);
-      } 
-    }
-
-    System.out.println("tprima2s3");
-    System.out.println(tprima2s3);
-
-    //creacion de t'2 y t''2 definitivas
-    for (int i = 0; i < atributosS12.size(); i++) {
-      List<String> conjunto = atributosS12.get(i);
-      int elementosBorrados = 0;
-      //resta
-
-
-      for (int j = 0; j < conjunto.size(); j++) {
-        if (tprima2s3.indexOf(conjunto.get(j)) >= 0){
-          conjunto.remove(j);
-          elementosBorrados ++;
-        } 
-      }
-      
-      //vacio o igual a s1
-      if (conjunto.size()!=0 && elementosBorrados != 0) {
-        for (int j = 0; j < conjunto.size(); j++) {
-          if (tprima2.indexOf(conjunto.get(j)) <  0){
-            tprima2.add(conjunto.get(j));
+        //regla
+        //todo lo de t2 que esta en s3
+        List<String> tprima2s3 = new ArrayList<String>();
+        List<String> tprima2 = new ArrayList<String>();
+        List<String> tdoblePrima2 = new ArrayList<String>();
+        for (int i = 0; i < ConjS3.size(); i++) {
+          String atributo = ConjS3.get(i);
+          if (atributosT2.indexOf(atributo)>=0) {
+            tprima2s3.add(atributo);
+            tprima2.add(atributo);
           } 
         }
-      }
-      //interseccion S1i con t'2
-      if(elementosBorrados == 0){
-        for (int j = 0; j < conjunto.size(); j++) {
-          if ((tdoblePrima2.indexOf(conjunto.get(j)) <  0) && (atributosT2.indexOf(conjunto.get(j)) >=  0) ){
-            tdoblePrima2.add(conjunto.get(j));
+
+        System.out.println("tprima2s3");
+        System.out.println(tprima2s3);
+
+        //creacion de t'2 y t''2 definitivas
+        for (int i = 0; i < atributosS12.size(); i++) {
+          List<String> conjunto = atributosS12.get(i);
+          int elementosBorrados = 0;
+          //resta
+
+
+          for (int j = 0; j < conjunto.size(); j++) {
+            if (tprima2s3.indexOf(conjunto.get(j)) >= 0){
+              conjunto.remove(j);
+              elementosBorrados ++;
+            } 
+          }
+
+          //vacio o igual a s1
+          if (conjunto.size()!=0 && elementosBorrados != 0) {
+            for (int j = 0; j < conjunto.size(); j++) {
+              if (tprima2.indexOf(conjunto.get(j)) <  0){
+                tprima2.add(conjunto.get(j));
+              } 
+            }
+          }
+          //interseccion S1i con t'2
+          if(elementosBorrados == 0){
+            for (int j = 0; j < conjunto.size(); j++) {
+              if ((tdoblePrima2.indexOf(conjunto.get(j)) <  0) && (atributosT2.indexOf(conjunto.get(j)) >=  0) ){
+                tdoblePrima2.add(conjunto.get(j));
+              } 
+            }
+          }
+        }
+
+        System.out.println("tprima2");
+        System.out.println(tprima2);
+        System.out.println("tdoblePrima2");
+        System.out.println(tdoblePrima2);
+
+        //regla
+        //todo lo de t3 que esta en s3
+        List<String> tprima3s3 = new ArrayList<String>();
+        List<String> tprima3 = new ArrayList<String>();
+        List<String> tdoblePrima3 = new ArrayList<String>();
+        for (int i = 0; i < ConjS3.size(); i++) {
+          String atributo = ConjS3.get(i);
+          if (atributosT3.indexOf(atributo)>=0) {
+            tprima3s3.add(atributo);
+            tprima3.add(atributo);
           } 
         }
-      }
-    }
 
-    System.out.println("tprima2");
-    System.out.println(tprima2);
-    System.out.println("tdoblePrima2");
-    System.out.println(tdoblePrima2);
+        System.out.println("tprima3s3");
+        System.out.println(tprima3s3);
 
-    //regla
-    //todo lo de t3 que esta en s3
-    List<String> tprima3s3 = new ArrayList<String>();
-    List<String> tprima3 = new ArrayList<String>();
-    List<String> tdoblePrima3 = new ArrayList<String>();
-    for (int i = 0; i < ConjS3.size(); i++) {
-      String atributo = ConjS3.get(i);
-      if (atributosT3.indexOf(atributo)>=0) {
-        tprima3s3.add(atributo);
-        tprima3.add(atributo);
-      } 
-    }
-
-    System.out.println("tprima3s3");
-    System.out.println(tprima3s3);
-
-    //creacion de t'3 y t''3 definitivas
-    for (int i = 0; i < atributosS13.size(); i++) {
-      List<String> conjunto = atributosS13.get(i);
-      int elementosBorrados = 0;
-      //resta
+        //creacion de t'3 y t''3 definitivas
+        for (int i = 0; i < atributosS13.size(); i++) {
+          List<String> conjunto = atributosS13.get(i);
+          int elementosBorrados = 0;
+          //resta
 
 
-      for (int j = 0; j < conjunto.size(); j++) {
-        if (tprima3s3.indexOf(conjunto.get(j)) >= 0){
-          conjunto.remove(j);
-          elementosBorrados ++;
-        } 
-      }
-      
-      //vacio o igual a s1
-      if (conjunto.size()!=0 && elementosBorrados != 0) {
-        for (int j = 0; j < conjunto.size(); j++) {
-          if (tprima3.indexOf(conjunto.get(j)) <  0){
-            tprima3.add(conjunto.get(j));
-          } 
+          for (int j = 0; j < conjunto.size(); j++) {
+            if (tprima3s3.indexOf(conjunto.get(j)) >= 0){
+              conjunto.remove(j);
+              elementosBorrados ++;
+            } 
+          }
+
+          //vacio o igual a s1
+          if (conjunto.size()!=0 && elementosBorrados != 0) {
+            for (int j = 0; j < conjunto.size(); j++) {
+              if (tprima3.indexOf(conjunto.get(j)) <  0){
+                tprima3.add(conjunto.get(j));
+              } 
+            }
+          }
+          //interseccion S1i con t'3
+          if(elementosBorrados == 0){
+            for (int j = 0; j < conjunto.size(); j++) {
+              if ((tdoblePrima3.indexOf(conjunto.get(j)) <  0) && (atributosT3.indexOf(conjunto.get(j)) >=  0)){
+                tdoblePrima3.add(conjunto.get(j));
+              } 
+            }
+          }
         }
-      }
-      //interseccion S1i con t'3
-      if(elementosBorrados == 0){
-        for (int j = 0; j < conjunto.size(); j++) {
-          if ((tdoblePrima3.indexOf(conjunto.get(j)) <  0) && (atributosT3.indexOf(conjunto.get(j)) >=  0)){
-            tdoblePrima3.add(conjunto.get(j));
-          } 
+
+        System.out.println("tprima3");
+        System.out.println(tprima3);
+
+        System.out.println("tdoblePrima3");
+        System.out.println(tdoblePrima3);
+
+
+        //creación de 
+        //Q'={todo lo de t1,t'2:{sus cosas},t''2:{sus cosas}, t'3: {sus cosas}, t''3:{sus cosas}}
+
+        String qprima = "Q'={";
+
+        for (int i = 0; i < atributosT1.size(); i++) {
+          qprima += atributosT1.get(i)+", ";
         }
-      }
-    }
+        qprima += nombreT2+"_of_"+nombreT1+": {";
+        for (int i = 0; i < tprima2.size(); i++) {
+          qprima += tprima2.get(i)+", ";
+        }
 
-    System.out.println("tprima3");
-    System.out.println(tprima3);
+        qprima = qprima.substring(0, qprima.length()-2);
+        qprima += "}";
+        if(tdoblePrima2.size() != 0){
+          qprima += ", T''2: {";
+          for (int i = 0; i < tdoblePrima2.size(); i++) {
+            qprima += tdoblePrima2.get(i)+", ";
+          }
+          qprima = qprima.substring(0, qprima.length()-2);
+          qprima += "} ,";
+        }
+        qprima += nombreT3+"_of_"+nombreT1+": {";
+        for (int i = 0; i < tprima3.size(); i++) {
+          qprima += tprima3.get(i)+", ";
+        }
 
-    System.out.println("tdoblePrima3");
-    System.out.println(tdoblePrima3);
+        qprima = qprima.substring(0, qprima.length()-2);
+        qprima += "}";
+        if(tdoblePrima3.size() != 0){
+          qprima += ", T''3: {";
+          for (int i = 0; i < tdoblePrima3.size(); i++) {
+            qprima += tdoblePrima3.get(i)+", ";
+          }
+          qprima = qprima.substring(0, qprima.length()-2);
+          qprima += "}";
+        }
+        qprima += "}";
 
-
-    //creación de 
-    //Q'={todo lo de t1,t'2:{sus cosas},t''2:{sus cosas}, t'3: {sus cosas}, t''3:{sus cosas}}
-
-    String qprima = "Q'={";
-
-    for (int i = 0; i < atributosT1.size(); i++) {
-      qprima += atributosT1.get(i)+", ";
+        System.out.println(qprima);
+        JOptionPane.showMessageDialog(null, qprima );
     }
-    qprima += nombreT2+"_of_"+nombreT1+": {";
-    for (int i = 0; i < tprima2.size(); i++) {
-      qprima += tprima2.get(i)+", ";
-    }
-    
-    qprima = qprima.substring(0, qprima.length()-2);
-    qprima += "}";
-    if(tdoblePrima2.size() != 0){
-      qprima += ", T''2: {";
-      for (int i = 0; i < tdoblePrima2.size(); i++) {
-        qprima += tdoblePrima2.get(i)+", ";
-      }
-      qprima = qprima.substring(0, qprima.length()-2);
-      qprima += "} ,";
-    }
-    qprima += nombreT3+"_of_"+nombreT1+": {";
-    for (int i = 0; i < tprima3.size(); i++) {
-      qprima += tprima3.get(i)+", ";
-    }
-    
-    qprima = qprima.substring(0, qprima.length()-2);
-    qprima += "}";
-    if(tdoblePrima3.size() != 0){
-      qprima += ", T''3: {";
-      for (int i = 0; i < tdoblePrima3.size(); i++) {
-        qprima += tdoblePrima3.get(i)+", ";
-      }
-      qprima = qprima.substring(0, qprima.length()-2);
-      qprima += "}";
-    }
-    qprima += "}";
-    
-    System.out.println(qprima);
-    JOptionPane.showMessageDialog(null, qprima );
   }      
 }

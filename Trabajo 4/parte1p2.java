@@ -237,7 +237,7 @@ public class parte1p2 {
 
       // llama la función que dibuja
       dibujo1 DrawWindow = new dibujo1();
-      DrawWindow.setSize(560, 560);
+      DrawWindow.setSize(960, 960);
       DrawWindow.setResizable(false);
       DrawWindow.setTitle("Pintando locales y ventas");
       DrawWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -318,36 +318,40 @@ public class parte1p2 {
 
       public void paint(Graphics g) {
         g.setColor(Color.white);
-        g.fillRect(20, 40, 500, 500);
-        Color[] listaColores = { Color.YELLOW, Color.BLUE, Color.CYAN, Color.DARK_GRAY, Color.BLACK, Color.GREEN,
+        g.fillRect(20, 40, 900, 900);
+        Color[] listaColores = { Color.YELLOW, Color.BLUE, Color.CYAN, Color.GRAY, Color.LIGHT_GRAY, Color.GREEN,
             Color.MAGENTA, Color.ORANGE, Color.PINK, Color.RED };
 
         int y = 0;
         int x = 0;
         int contador = 0;
+        int numeroCuadro = 1;
         for (List<Double> list : infoCudrado) {
           double total = list.get(0);
           int indiceRango = 0;
           int indiceColor = 0;
           while (indiceRango <= rangoColores.size() - 1) {
             if (indiceRango == rangoColores.size() - 1) {
-              g.setColor(listaColores[indiceRango]);
+              g.setColor(listaColores[indiceColor]);
             } else if (total >= rangoColores.get(indiceRango) && total <= rangoColores.get(indiceRango + 1)) {
               g.setColor(listaColores[indiceColor]);
-              System.out.println(indiceRango);
               break;
             }
             indiceRango += 2;
             indiceColor++;
-
           }
-          g.fillRect(x + 20, y + 40, ladoCuadricula, ladoCuadricula);
-          y += 25;
+          g.fillRect(x + 20, y + 40, ladoCuadricula*9, ladoCuadricula*9);
+          g.setColor(Color.black);
+          g.drawString(String.valueOf(numeroCuadro), x+20, y+50);
+          g.drawString("total transacciones:"+total, x+30, y+60);
+          g.drawString("feed usd:"+list.get(1).toString(), x+30, y+75);
+          g.drawString("value usd:"+list.get(2).toString(), x+30, y+90);
+          y += 25*9;
           contador++;
+          numeroCuadro++;
           if (contador == 100 / ladoCuadricula) {
-            System.out.println("hola");
             y = 0;
-            x += 25;
+            x += 25*9;
             contador = 0;
           }
         }

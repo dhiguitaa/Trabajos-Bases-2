@@ -10,6 +10,7 @@ import javax.sound.sampled.SourceDataLine;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -25,12 +26,18 @@ public class parte1p2 {
   List<List<Double>> infoCudrado;
   int ladoCuadricula;
   List<Integer> rangoColores;
+  List<List<Integer>> transaccionesCuadrado;
+  List<List<String>> transacciones;
+  Connection conn;
+  Statement sentencia;
+  ResultSet resultado;
+  String fecha;
 
   public class ventana1 implements ActionListener {
 
     JButton enviar;
-    JLabel JLhoraInicio, JLhoraFin, JLladoCuadricula, JLcolores;
-    JTextField JThoraInicio, JThoraFin, JTladoCuadricula;
+    JLabel JLhoraInicio, JLhoraFin, JLladoCuadricula, JLcolores, JLncolores;
+    JTextField JThoraInicio, JThoraFin, JTladoCuadricula, JTncolores;
     JTextArea colores;
     JFrame jf = new JFrame("Formulario");
 
@@ -38,12 +45,14 @@ public class parte1p2 {
 
       jf.setLayout(new FlowLayout());
       enviar = new JButton("Ver mapa por numero de transacciones");
+      JLncolores = new JLabel("Ingrese el numero de colores:");
       JLcolores = new JLabel("Configurar escala para nro. de transacciones:");
       JLhoraFin = new JLabel("Hora y minuto final");
       JLhoraInicio = new JLabel("Hora y minuto inicial");
       JLladoCuadricula = new JLabel("Tamaño lado cuadricula");
       JThoraInicio = new JTextField(10);
       JThoraFin = new JTextField(10);
+      JTncolores = new JTextField(10);
       JTladoCuadricula = new JTextField(10);
       colores = new JTextArea(10, 20);
       enviar.addActionListener(this);
@@ -55,6 +64,8 @@ public class parte1p2 {
       jf.add(JLladoCuadricula);
       jf.add(JTladoCuadricula);
       jf.add(JLcolores);
+      jf.add(JLncolores);
+      jf.add(JTncolores);
       jf.add(colores);
       jf.add(enviar);
 
@@ -66,9 +77,6 @@ public class parte1p2 {
 
     public void actionPerformed(final ActionEvent e) {
 
-      Connection conn;
-      Statement sentencia;
-      ResultSet resultado;
       try { // Se carga el driver JDBC-ODBC
         Class.forName("oracle.jdbc.driver.OracleDriver");
       } catch (final Exception err) {
@@ -88,7 +96,7 @@ public class parte1p2 {
       // String horaFin = JThoraInicio.getText();
       // int ladoCuadricula = Integer.parseInt(JTladoCuadricula.getText());
 
-      List<List<String>> transacciones = new ArrayList<List<String>>();
+      transacciones = new ArrayList<List<String>>();
       try {
 
         // Pasar las transacciones a una lista de lista
@@ -157,11 +165,12 @@ public class parte1p2 {
       // Se pasan a minutos todo para que sea mas facil la comparación
       int minutosIniciales = horaInicio * 60 + minutoInicio;
       int minutosFinales = horaFinal * 60 + minutoFinal;
-
+      
       // Se gurda la info de las transacciones que esten en el intervalo limite del
       // tiempo deseado
       List<Integer> indicesTransLimite = new ArrayList<Integer>();
       for (int i = 0; i < transacciones.size(); i++) {
+        fecha = transacciones.get(i).get(0).split(" ")[0];
         int hora = Integer.parseInt(transacciones.get(i).get(0).split(" ")[1].split(":")[0]);
         int minuto = Integer.parseInt(transacciones.get(i).get(0).split(" ")[1].split(":")[1]);
 
@@ -183,7 +192,7 @@ public class parte1p2 {
       // Movimiento ARRIBA-abajo IZQUIERDA-derecha
       int contadorCuadrado = 0;
       infoCudrado = new ArrayList<List<Double>>();
-      List<List<Integer>> transaccionesCuadrado = new ArrayList<List<Integer>>();
+      transaccionesCuadrado = new ArrayList<List<Integer>>();
 
       // Se ingresa a infoCuadradoMatriz la informacion total de cada cuadrado
       // Se ingresa a transaccionesCudradoMatriz los indices de las transacciones de
@@ -244,79 +253,9 @@ public class parte1p2 {
       DrawWindow.setTitle("Pintando locales y ventas");
       DrawWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
       DrawWindow.setVisible(true);
-
-      // Falta grafica
-
-      System.out.println(transaccionesCuadrado.size());
-      // Despues de darle en el botón ordenar
-      int numeroCuadrado = 3; // Textlabel
-      numeroCuadrado -= 1;
-
-      for (Integer indiceTrans : transaccionesCuadrado.get(numeroCuadrado)) {
-        transacciones.get(indiceTrans);
-      }
-
-      // Aqui se dropea la tabla auxiliar1 en BD
-      Statement stmtDrop = null;
-      try {
-        stmtDrop = conn.createStatement();
-        String sql = "DROP TABLE auxiliar1";
-        stmtDrop.executeUpdate(sql);
-      } catch (SQLException sqle) {
-        System.out.println("Error en la ejecución: " + sqle.getErrorCode() + " " + sqle.getMessage());
-      }
-
-      // Aqui se crea la tabla auxiliar1 en BD
-      PreparedStatement stmt = null;
-      try { // block_id, x, y, sender, recipient, value_usd, fee_usd y time.
-        stmt = conn.prepareStatement(
-            "CREATE TABLE auxiliar1 (block_id varchar(4000), x varchar(4000), y varchar(4000), sender varchar(4000), recipient varchar(4000), value_usd float(126),fee_usd float(126), timeMinutos number(38))");
-        stmt.execute();
-        stmt.close();
-      } catch (SQLException sqle) {
-        System.out.println("Error en la ejecución: " + sqle.getErrorCode() + " " + sqle.getMessage());
-      }
-
-      // Aqui se ingresa los datos a la tabla auxiliar1 en BD
-      for (int i = 0; i < transaccionesCuadrado.get(numeroCuadrado).size(); i++) {
-        String block_id = transacciones.get(i).get(5);
-        String x = transacciones.get(i).get(1);
-        String y = transacciones.get(i).get(2);
-        String sender = transacciones.get(i).get(6);
-        String recipient = transacciones.get(i).get(7);
-        double value_usd = Double.parseDouble(transacciones.get(i).get(3));
-        double fee_usd = Double.parseDouble(transacciones.get(i).get(4));
-
-        String time = transacciones.get(i).get(0);
-        int hora = Integer.parseInt(time.split(" ")[1].split(":")[0]);
-        int minuto = Integer.parseInt(time.split(" ")[1].split(":")[1]);
-        int minutosTotales = hora * 60 + minuto;
-
-        try {
-          PreparedStatement stmtInsertar = conn.prepareStatement("INSERT INTO auxiliar1 VALUES (?,?,?,?,?,?,?,?)");
-          stmtInsertar.setString(1, block_id);
-          stmtInsertar.setString(2, x);
-          stmtInsertar.setString(3, y);
-          stmtInsertar.setString(4, sender);
-          stmtInsertar.setString(5, recipient);
-          stmtInsertar.setDouble(6, value_usd);
-          stmtInsertar.setDouble(7, fee_usd);
-          stmtInsertar.setInt(8, minutosTotales);
-          stmtInsertar.executeUpdate();
-        } catch (SQLException sqle) {
-          System.out.println("Error en la ejecución: " + sqle.getErrorCode() + " " + sqle.getMessage());
-        }
-
-      }
-
-      // Ordenada
-      // Select * from auxiliar1 order by value_usd;
-      // Select * from auxiliar1 order by fee_usd;
-      // Select * from auxiliar1 order by timeminutos;
-
     };
 
-    public class dibujo1 extends JFrame {
+    public class dibujo1 extends JFrame implements ActionListener {
 
       public void paint(Graphics g) {
 
@@ -335,7 +274,6 @@ public class parte1p2 {
         // recoremos los cuadrados para dibujar su informacion
         for (List<Double> list : infoCudrado) {
           // miramos que Y no se pase de los limites
-          System.out.println("y-"+y);
           if (y + h > 900 - cuadroLado) {
             h = 900 - y - 1;
           }
@@ -362,7 +300,6 @@ public class parte1p2 {
           g.drawString("value usd:" + list.get(2).toString(), x + 30, y + 90);
 
           // aumentamos la Y para el siguiente cuadrado
-          System.out.println("x: " + x + "y: " + y);
           y += h - 1;
           contador++;
           numeroCuadro++;
@@ -372,16 +309,13 @@ public class parte1p2 {
             x += w - 1;
             // si la w o la h son menores es porque se pasaban pero ahora tenemos que
             // formatearlas
-            System.out.println("x-"+x);
-            System.out.println("w "+w+"h "+h);
             // miramos si la x se pasa
             if (x + w > 900 - cuadroLado) {
               w = 900 - x - 1;
-              h = ladoCuadricula*9;
-            }
-            else if (w < ladoCuadricula*9 || h < ladoCuadricula*9) {
-              w = ladoCuadricula*9;
-              h = ladoCuadricula*9;
+              h = ladoCuadricula * 9;
+            } else if (w < ladoCuadricula * 9 || h < ladoCuadricula * 9) {
+              w = ladoCuadricula * 9;
+              h = ladoCuadricula * 9;
             }
             contador = 0;
           }
@@ -390,30 +324,136 @@ public class parte1p2 {
 
       }
 
+      JButton timeMinutos, value_usd, fee_usd;
+      JTextField JTnumeroCuadrado;
+
       public dibujo1() {
-        JButton time, value_usd, fee_usd;
+        final Dimension d = new Dimension();
         JFrame jf2 = new JFrame("tabla 2");
         JLabel JLnumeroCuadricula = new JLabel("Ingrese numero de cuadricula:");
         JLabel JLorden = new JLabel("Ordenar por:");
-        JTextField numeroCuadricula = new JTextField(10);
-        time = new JButton("time");
+        JTnumeroCuadrado = new JTextField(10);
+        timeMinutos = new JButton("time");
         value_usd = new JButton("value_usd");
         fee_usd = new JButton("fee_usd");
+
+        timeMinutos.addActionListener(this);
+        value_usd.addActionListener(this);
+        fee_usd.addActionListener(this);
+
         JPanel jp = new JPanel();
         jp.add(JLnumeroCuadricula);
-        jp.add(numeroCuadricula);
+        jp.add(JTnumeroCuadrado);
         jp.add(JLorden);
-        jp.add(time);
+        jp.add(timeMinutos);
         jp.add(value_usd);
         jp.add(fee_usd);
-
         jf2.add(jp);
 
         jf2.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);// finaliza el programa cuando se da click en la X
+        jf2.setLocation((int) ((d.getWidth() / 2) + 1000), 50);
         jf2.setResizable(false);// para configurar si se redimensiona la ventana
         jf2.setSize(600, 300);// configurando tamaño de la ventana (ancho, alto)
         // jf2.setLocation((int) ((d.getWidth() / 2) + 290), 50);
         jf2.setVisible(true);
+      }
+
+      public void actionPerformed(final ActionEvent e) {// sobreescribimos el metgetLocaleso del listener
+
+        // variables que almacenaran los textos de los campos de texto
+        // Despues de darle en el botón ordenar
+        int numeroCuadrado = Integer.parseInt(JTnumeroCuadrado.getText());
+        numeroCuadrado -= 1;
+
+        // Aqui se dropea la tabla auxiliar1 en BD
+        Statement stmtDrop = null;
+        try {
+          stmtDrop = conn.createStatement();
+          String sql = "DROP TABLE auxiliar1";
+          stmtDrop.executeUpdate(sql);
+        } catch (SQLException sqle) {
+          System.out.println("Error en la ejecución: " + sqle.getErrorCode() + " " + sqle.getMessage());
+        }
+
+        // Aqui se crea la tabla auxiliar1 en BD
+        PreparedStatement stmt = null;
+        try { // block_id, x, y, sender, recipient, value_usd, fee_usd y time.
+          stmt = conn.prepareStatement(
+              "CREATE TABLE auxiliar1 (block_id varchar(4000), x varchar(4000), y varchar(4000), sender varchar(4000), recipient varchar(4000), value_usd float(126),fee_usd float(126), timeMinutos number(38))");
+          stmt.execute();
+          stmt.close();
+        } catch (SQLException sqle) {
+          System.out.println("Error en la ejecución: " + sqle.getErrorCode() + " " + sqle.getMessage());
+        }
+
+        // Aqui se ingresa los datos a la tabla auxiliar1 en BD
+        for (int i = 0; i < transaccionesCuadrado.get(numeroCuadrado).size(); i++) {
+          String block_id = transacciones.get(i).get(5);
+          String x = transacciones.get(i).get(1);
+          String y = transacciones.get(i).get(2);
+          String sender = transacciones.get(i).get(6);
+          String recipient = transacciones.get(i).get(7);
+          double value_usd = Double.parseDouble(transacciones.get(i).get(3));
+          double fee_usd = Double.parseDouble(transacciones.get(i).get(4));
+
+          String time = transacciones.get(i).get(0);
+          int hora = Integer.parseInt(time.split(" ")[1].split(":")[0]);
+          int minuto = Integer.parseInt(time.split(" ")[1].split(":")[1]);
+          int minutosTotales = hora * 60 + minuto;
+
+          try {
+            PreparedStatement stmtInsertar = conn.prepareStatement("INSERT INTO auxiliar1 VALUES (?,?,?,?,?,?,?,?)");
+            stmtInsertar.setString(1, block_id);
+            stmtInsertar.setString(2, x);
+            stmtInsertar.setString(3, y);
+            stmtInsertar.setString(4, sender);
+            stmtInsertar.setString(5, recipient);
+            stmtInsertar.setDouble(6, value_usd);
+            stmtInsertar.setDouble(7, fee_usd);
+            stmtInsertar.setInt(8, minutosTotales);
+            stmtInsertar.executeUpdate();
+          } catch (SQLException sqle) {
+            System.out.println("Error en la ejecución: " + sqle.getErrorCode() + " " + sqle.getMessage());
+          }
+
+        }
+        
+        // block_id, x, y, sender, recipient, value_usd, fee_usd y time
+        String respuesta = "block_id, x, y, sender, recipient, value_usd, fee_usd, time \n\n";
+        String consulta= "";
+        if (e.getSource() == timeMinutos){
+          consulta = "Select * from auxiliar1 order by timeMinutos";
+          
+        }else if(e.getSource() == value_usd){
+          consulta = "Select * from auxiliar1 order by value_usd";
+
+        }
+        else if(e.getSource() == fee_usd){
+          consulta = "Select * from auxiliar1 order by fee_usd";
+
+        }
+        try {
+          resultado = sentencia.executeQuery(consulta);
+          while (resultado.next()) {
+            respuesta += resultado.getString("block_id") + ", ";
+            respuesta += resultado.getString("x") + ", ";
+            respuesta += resultado.getString("y") + ", ";
+            respuesta += resultado.getString("sender") + ", ";
+            respuesta += resultado.getString("recipient") + ", ";
+            respuesta += resultado.getDouble("value_usd") + ", ";
+            respuesta += resultado.getDouble("fee_usd") + ", ";
+            respuesta += fecha+" ";
+            int mintotales = resultado.getInt("timeMinutos");
+            int minutos = mintotales%60;
+            int hora =  (mintotales-minutos)/60;
+            respuesta += hora+":"+minutos+"\n";
+          }
+          System.out.println(respuesta);
+          JOptionPane.showMessageDialog(null, respuesta);
+        } catch (Exception err) {
+          System.out.println(err);
+        }
+
       }
     }
   }

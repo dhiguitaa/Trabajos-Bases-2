@@ -191,8 +191,6 @@ public class parte1p3 {
       g.setColor(Color.lightGray);
       int Valormayor = (int) ValorUsdMayor;
       g.fillRect(20, 40, 900, 900);
-      g.setColor(Color.green);
-      g.drawOval(Valormayor/1000 + 20, Valormayor/1000 + 40, 4, 4);
       Collections.sort(listaMiner1);
       Collections.sort(listaMiner2);
       int min1 = Collections.min(listaMiner1).intValue();

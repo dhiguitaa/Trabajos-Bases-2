@@ -10,6 +10,7 @@ import javax.sound.sampled.SourceDataLine;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
@@ -18,6 +19,7 @@ import oracle.net.aso.e;
 import java.awt.*;
 import java.util.List;
 import java.util.ArrayList;
+import java.lang.Math;
 
 public class parte1p2 {
   List<List<Double>> infoCudrado;
@@ -215,7 +217,7 @@ public class parte1p2 {
               totalTransacciones += 1;
               totalFeeUsd += Double.parseDouble(transacciones.get(indice).get(4));
               totalValueUsd += Double.parseDouble(transacciones.get(indice).get(3)); // Error porque piensa que los
-  
+
               transaccionesCuadrado.get(contadorCuadrado).add(indice);
               listaIndicesParaBorrar.add(indice);
             }
@@ -317,19 +319,30 @@ public class parte1p2 {
     public class dibujo1 extends JFrame {
 
       public void paint(Graphics g) {
-        g.setColor(Color.white);
+
+        g.setColor(Color.black);
         g.fillRect(20, 40, 900, 900);
         Color[] listaColores = { Color.YELLOW, Color.BLUE, Color.CYAN, Color.GRAY, Color.LIGHT_GRAY, Color.GREEN,
             Color.MAGENTA, Color.ORANGE, Color.PINK, Color.RED };
 
         int y = 0;
         int x = 0;
+        int h = ladoCuadricula * 9;
+        int w = ladoCuadricula * 9;
         int contador = 0;
         int numeroCuadro = 1;
+        Double cuadroLado = Math.sqrt(infoCudrado.size());
+        // recoremos los cuadrados para dibujar su informacion
         for (List<Double> list : infoCudrado) {
+          // miramos que Y no se pase de los limites
+          System.out.println("y-"+y);
+          if (y + h > 900 - cuadroLado) {
+            h = 900 - y - 1;
+          }
           double total = list.get(0);
           int indiceRango = 0;
           int indiceColor = 0;
+          // miramos que color le corresponde a cada cuadro
           while (indiceRango <= rangoColores.size() - 1) {
             if (indiceRango == rangoColores.size() - 1) {
               g.setColor(listaColores[indiceColor]);
@@ -340,22 +353,67 @@ public class parte1p2 {
             indiceRango += 2;
             indiceColor++;
           }
-          g.fillRect(x + 20, y + 40, ladoCuadricula*9, ladoCuadricula*9);
+          // dibujamos el cuadrado y ponermos la info
+          g.fillRect(x + 20, y + 40, w, h);
           g.setColor(Color.black);
-          g.drawString(String.valueOf(numeroCuadro), x+20, y+50);
-          g.drawString("total transacciones:"+total, x+30, y+60);
-          g.drawString("feed usd:"+list.get(1).toString(), x+30, y+75);
-          g.drawString("value usd:"+list.get(2).toString(), x+30, y+90);
-          y += 25*9;
+          g.drawString(String.valueOf(numeroCuadro), x + 20, y + 50);
+          g.drawString("total transacciones:" + total, x + 30, y + 60);
+          g.drawString("feed usd:" + list.get(1).toString(), x + 30, y + 75);
+          g.drawString("value usd:" + list.get(2).toString(), x + 30, y + 90);
+
+          // aumentamos la Y para el siguiente cuadrado
+          System.out.println("x: " + x + "y: " + y);
+          y += h - 1;
           contador++;
           numeroCuadro++;
-          if (contador == 100 / ladoCuadricula) {
+          // miramos si ya se hicieron los cuadrados de la columna
+          if (contador == cuadroLado) {
             y = 0;
-            x += 25*9;
+            x += w - 1;
+            // si la w o la h son menores es porque se pasaban pero ahora tenemos que
+            // formatearlas
+            System.out.println("x-"+x);
+            System.out.println("w "+w+"h "+h);
+            // miramos si la x se pasa
+            if (x + w > 900 - cuadroLado) {
+              w = 900 - x - 1;
+              h = ladoCuadricula*9;
+            }
+            else if (w < ladoCuadricula*9 || h < ladoCuadricula*9) {
+              w = ladoCuadricula*9;
+              h = ladoCuadricula*9;
+            }
             contador = 0;
           }
+
         }
 
+      }
+
+      public dibujo1() {
+        JButton time, value_usd, fee_usd;
+        JFrame jf2 = new JFrame("tabla 2");
+        JLabel JLnumeroCuadricula = new JLabel("Ingrese numero de cuadricula:");
+        JLabel JLorden = new JLabel("Ordenar por:");
+        JTextField numeroCuadricula = new JTextField(10);
+        time = new JButton("time");
+        value_usd = new JButton("value_usd");
+        fee_usd = new JButton("fee_usd");
+        JPanel jp = new JPanel();
+        jp.add(JLnumeroCuadricula);
+        jp.add(numeroCuadricula);
+        jp.add(JLorden);
+        jp.add(time);
+        jp.add(value_usd);
+        jp.add(fee_usd);
+
+        jf2.add(jp);
+
+        jf2.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);// finaliza el programa cuando se da click en la X
+        jf2.setResizable(false);// para configurar si se redimensiona la ventana
+        jf2.setSize(600, 300);// configurando tamaño de la ventana (ancho, alto)
+        // jf2.setLocation((int) ((d.getWidth() / 2) + 290), 50);
+        jf2.setVisible(true);
       }
     }
   }

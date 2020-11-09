@@ -313,9 +313,9 @@ public class parte1p2 {
           g.fillRect(x + 20, y + 40, w, h);
           g.setColor(Color.black);
           g.drawString(String.valueOf(numeroCuadro), x + 20, y + 50);
-          g.drawString("total transacciones:" + total, x + 30, y + 60);
-          g.drawString("feed usd:" + list.get(1).toString(), x + 30, y + 75);
-          g.drawString("value usd:" + list.get(2).toString(), x + 30, y + 90);
+          g.drawString("N:" + total, x + 30, y + 60);
+          g.drawString("F:" + list.get(1).toString(), x + 30, y + 75);
+          g.drawString("V:" + list.get(2).toString(), x + 30, y + 90);
 
           // aumentamos la Y para el siguiente cuadrado
           y += h - 1;

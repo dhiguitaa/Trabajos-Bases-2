@@ -1,5 +1,4 @@
-import java.awt.BorderLayout;
-import java.awt.Window;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -10,13 +9,10 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 import java.awt.FlowLayout;
 import multichain.command.*;
 import multichain.object.*;
-import sun.net.www.content.image.jpeg;
 import java.util.ArrayList;
-import java.util.List;
 
 import java.sql.*;
 
@@ -66,7 +62,7 @@ public class parte2p2 {
         return;
       }
 
-      cm = new CommandManager("localhost", "6468", "multichainrpc", "8VQt9ESdffXquEXFUXjZvd8jCCfQaYajiDGoHbu1ytc3");
+      cm = new CommandManager("localhost", "4344", "multichainrpc", "7yebJt75FUcMVZEfgRP1o7v825ifBd2mptiCPdPESe6z");
 
       if (e.getSource() == registrar) {
         JDialog registro = new JDialog(jf, true);
@@ -176,7 +172,7 @@ public class parte2p2 {
       JPanel p = new JPanel();
       consultar = new JButton("consultar saldo");
       pagar = new JButton("pagar");
-      cerrar = new JButton("cerrar");
+      cerrar = new JButton("cerrar seccion");
       // pagar
       pagar.addActionListener(new ActionListener() {
         @Override
@@ -185,8 +181,8 @@ public class parte2p2 {
           JPanel pPagar = new JPanel();
           JLabel Jlus = new JLabel("Usuario destino");
           JLabel Jlvalor = new JLabel("Valor");
-          JTextField Jtus = new JTextField(15);
-          JTextField Jtvalor = new JTextField(15);
+          JTextField Jtus = new JTextField(20);
+          JTextField Jtvalor = new JTextField(20);
           JButton bPagar = new JButton("pagar");
           pPagar.add(Jlus);
           pPagar.add(Jtus);
@@ -195,11 +191,10 @@ public class parte2p2 {
           pPagar.add(bPagar);
           pagar.add(pPagar);
           
-
+          //accion de pagar
           bPagar.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e){
-              System.out.println("hola");
               String nombre = Jtus.getText(); 
               int valor = Integer.parseInt(Jtvalor.getText());
               
@@ -210,8 +205,12 @@ public class parte2p2 {
                 while(resultado.next()){
                   sendTo = resultado.getString("direccion");
                 }
-                cm.invoke(CommandElt.SENDASSETFROM,miDicreccion,sendTo,"bdcoin",valor);
-                System.out.println("okay");
+                try {
+                  cm.invoke(CommandElt.SENDASSETFROM,miDicreccion,sendTo,"bdcoin",valor);
+                  JOptionPane.showMessageDialog(null, "Pago exitoso");
+                } catch (Exception err) {
+                  JOptionPane.showMessageDialog(null, "Alguno de los datos no es valido");
+                }
               } catch (Exception err) {
                 System.out.println(err);
               }
@@ -244,8 +243,13 @@ public class parte2p2 {
           
           try {
             ArrayList<BalanceAssetGeneral> list =(ArrayList<BalanceAssetGeneral>) cm.invoke(CommandElt.GETADDRESSBALANCES,miDicreccion);
-            String valor = String.valueOf(list.get(0).getQty());
-            Jlsaldo.setText(valor);
+            try {
+              
+              String valor = String.valueOf(list.get(0).getQty());
+              Jlsaldo.setText(valor);
+            } catch (Exception err) {
+              Jlsaldo.setText("0");            }
+            
             pConsultar.add(Jlsaldo);
 
           } catch (Exception err) {

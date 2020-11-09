@@ -4,3 +4,5 @@ create table usuario(
   contrasena varchar(100),
   direccion varchar(4000)
 );
+
+insert into usuario values('admin','admin','1Wco4YpGpGkZ76YFfeEHo7twX9ujbyvHkwCzeD');

@@ -85,7 +85,7 @@ public class parte1p2 {
       }
 
       try { // Se establece la conexi�n con la base de datos Oracle Express
-        conn = DriverManager.getConnection("jdbc:oracle:thin:@DESKTOP-LV4ONBF:1521:xe", "dani", "dani");
+        conn = DriverManager.getConnection("jdbc:oracle:thin:@DESKTOP-KBMHID4:1521:xe","augusto","rxnlomejor");
         sentencia = conn.createStatement();
       } catch (final SQLException err) {
         System.out.println("No hay conexi�n con la base de datos.");
@@ -145,114 +145,124 @@ public class parte1p2 {
         System.out.println("catch: " + err);
       }
 
-      int horaInicio = Integer.parseInt(JThoraInicio.getText().split(":")[0]);
-      int minutoInicio = Integer.parseInt(JThoraInicio.getText().split(":")[1]);
-      int horaFinal = Integer.parseInt(JThoraFin.getText().split(":")[0]);
-      int minutoFinal = Integer.parseInt(JThoraFin.getText().split(":")[1]);
-      // se guardan los rangos de los colores
-      String textColores = colores.getText();
-      String[] splitColores = textColores.split("\n");
-      rangoColores = new ArrayList<Integer>();
-      for (String string : splitColores) {
-        String[] rango = string.split("-");
-        rangoColores.add(Integer.parseInt(rango[0]));
-        try {
-          rangoColores.add(Integer.parseInt(rango[1]));
-        } catch (Exception err) {
 
-        }
-      }
-      // Se pasan a minutos todo para que sea mas facil la comparación
-      int minutosIniciales = horaInicio * 60 + minutoInicio;
-      int minutosFinales = horaFinal * 60 + minutoFinal;
-      
-      // Se gurda la info de las transacciones que esten en el intervalo limite del
-      // tiempo deseado
-      List<Integer> indicesTransLimite = new ArrayList<Integer>();
-      for (int i = 0; i < transacciones.size(); i++) {
-        fecha = transacciones.get(i).get(0).split(" ")[0];
-        int hora = Integer.parseInt(transacciones.get(i).get(0).split(" ")[1].split(":")[0]);
-        int minuto = Integer.parseInt(transacciones.get(i).get(0).split(" ")[1].split(":")[1]);
-
-        int minutosTransaccion = hora * 60 + minuto;
-
-        if (minutosTransaccion >= minutosIniciales && minutosTransaccion <= minutosFinales) {
-          indicesTransLimite.add(i);
-        }
-      }
-
-      // Formula de colisionamiento
-      // x1 >= x2 - w1 && x1 <= x2 + w2 && y1 >= y2 - h1 && y1 <= y2 + h2
-
-      // NOTA. Toca amplificarlo
-      int restaAmplificada = 1;
       ladoCuadricula = Integer.parseInt(JTladoCuadricula.getText());
-      int cuatriculaMaxima = 99;
 
-      // Movimiento ARRIBA-abajo IZQUIERDA-derecha
-      int contadorCuadrado = 0;
-      infoCudrado = new ArrayList<List<Double>>();
-      transaccionesCuadrado = new ArrayList<List<Integer>>();
-
-      // Se ingresa a infoCuadradoMatriz la informacion total de cada cuadrado
-      // Se ingresa a transaccionesCudradoMatriz los indices de las transacciones de
-      // cada cuadrado
-      for (int h = 0; h < cuatriculaMaxima; h += ladoCuadricula) {
-        int coorx = h;
-        if (coorx != 0) {
-          coorx = coorx - restaAmplificada;
-        }
-        for (int r = 0; r < cuatriculaMaxima; r += ladoCuadricula) {
-          int coory = r;
-          if (coory != 0) {
-            coory = coory - restaAmplificada;
+      if(ladoCuadricula % 5 == 0){
+        int horaInicio = Integer.parseInt(JThoraInicio.getText().split(":")[0]);
+        int minutoInicio = Integer.parseInt(JThoraInicio.getText().split(":")[1]);
+        int horaFinal = Integer.parseInt(JThoraFin.getText().split(":")[0]);
+        int minutoFinal = Integer.parseInt(JThoraFin.getText().split(":")[1]);
+        // se guardan los rangos de los colores
+        String textColores = colores.getText();
+        String[] splitColores = textColores.split("\n");
+        rangoColores = new ArrayList<Integer>();
+        for (String string : splitColores) {
+          String[] rango = string.split("-");
+          rangoColores.add(Integer.parseInt(rango[0]));
+          try {
+            rangoColores.add(Integer.parseInt(rango[1]));
+          } catch (Exception err) {
+  
           }
-
-          transaccionesCuadrado.add(new ArrayList<Integer>());
-          infoCudrado.add(new ArrayList<Double>());
-          double totalTransacciones = 0;
-          double totalFeeUsd = 0;
-          double totalValueUsd = 0;
-
-          List<Integer> listaIndicesParaBorrar = new ArrayList<Integer>();
-          for (int i = 0; i < indicesTransLimite.size(); i++) {
-            int indice = indicesTransLimite.get(i);
-            int xTrans = Integer.parseInt(transacciones.get(indice).get(1));
-            int yTrans = Integer.parseInt(transacciones.get(indice).get(2));
-
-            if (coorx >= xTrans - ladoCuadricula && coorx <= xTrans + ladoCuadricula && coory >= yTrans - ladoCuadricula
-                && coory <= yTrans + ladoCuadricula) {
-              // El punto pertenece a este cuadrado
-              totalTransacciones += 1;
-              totalFeeUsd += Double.parseDouble(transacciones.get(indice).get(4));
-              totalValueUsd += Double.parseDouble(transacciones.get(indice).get(3)); // Error porque piensa que los
-
-              transaccionesCuadrado.get(contadorCuadrado).add(indice);
-              listaIndicesParaBorrar.add(indice);
+        }
+        // Se pasan a minutos todo para que sea mas facil la comparación
+        int minutosIniciales = horaInicio * 60 + minutoInicio;
+        int minutosFinales = horaFinal * 60 + minutoFinal;
+        
+        // Se gurda la info de las transacciones que esten en el intervalo limite del
+        // tiempo deseado
+        List<Integer> indicesTransLimite = new ArrayList<Integer>();
+        for (int i = 0; i < transacciones.size(); i++) {
+          fecha = transacciones.get(i).get(0).split(" ")[0];
+          int hora = Integer.parseInt(transacciones.get(i).get(0).split(" ")[1].split(":")[0]);
+          int minuto = Integer.parseInt(transacciones.get(i).get(0).split(" ")[1].split(":")[1]);
+  
+          int minutosTransaccion = hora * 60 + minuto;
+  
+          if (minutosTransaccion >= minutosIniciales && minutosTransaccion <= minutosFinales) {
+            indicesTransLimite.add(i);
+          }
+        }
+  
+        // Formula de colisionamiento
+        // x1 >= x2 - w1 && x1 <= x2 + w2 && y1 >= y2 - h1 && y1 <= y2 + h2
+  
+        // NOTA. Toca amplificarlo
+        int restaAmplificada = 1;
+        
+        int cuatriculaMaxima = 99;
+  
+        // Movimiento ARRIBA-abajo IZQUIERDA-derecha
+        int contadorCuadrado = 0;
+        infoCudrado = new ArrayList<List<Double>>();
+        transaccionesCuadrado = new ArrayList<List<Integer>>();
+  
+        // Se ingresa a infoCuadradoMatriz la informacion total de cada cuadrado
+        // Se ingresa a transaccionesCudradoMatriz los indices de las transacciones de
+        // cada cuadrado
+        for (int h = 0; h < cuatriculaMaxima; h += ladoCuadricula) {
+          int coorx = h;
+          if (coorx != 0) {
+            coorx = coorx - restaAmplificada;
+          }
+          for (int r = 0; r < cuatriculaMaxima; r += ladoCuadricula) {
+            int coory = r;
+            if (coory != 0) {
+              coory = coory - restaAmplificada;
             }
+  
+            transaccionesCuadrado.add(new ArrayList<Integer>());
+            infoCudrado.add(new ArrayList<Double>());
+            double totalTransacciones = 0;
+            double totalFeeUsd = 0;
+            double totalValueUsd = 0;
+  
+            List<Integer> listaIndicesParaBorrar = new ArrayList<Integer>();
+            for (int i = 0; i < indicesTransLimite.size(); i++) {
+              int indice = indicesTransLimite.get(i);
+              int xTrans = Integer.parseInt(transacciones.get(indice).get(1));
+              int yTrans = Integer.parseInt(transacciones.get(indice).get(2));
+  
+              if (coorx >= xTrans - ladoCuadricula && coorx <= xTrans + ladoCuadricula && coory >= yTrans - ladoCuadricula
+                  && coory <= yTrans + ladoCuadricula) {
+                // El punto pertenece a este cuadrado
+                totalTransacciones += 1;
+                totalFeeUsd += Double.parseDouble(transacciones.get(indice).get(4));
+                totalValueUsd += Double.parseDouble(transacciones.get(indice).get(3)); // Error porque piensa que los
+  
+                transaccionesCuadrado.get(contadorCuadrado).add(indice);
+                listaIndicesParaBorrar.add(indice);
+              }
+            }
+  
+            for (int i = 0; i < listaIndicesParaBorrar.size(); i++) {
+              int indiceBorrar = indicesTransLimite.indexOf(listaIndicesParaBorrar.get(i));
+              indicesTransLimite.remove(indiceBorrar);
+            }
+  
+            infoCudrado.get(contadorCuadrado).add(totalTransacciones);
+            infoCudrado.get(contadorCuadrado).add(totalFeeUsd);
+            infoCudrado.get(contadorCuadrado).add(totalValueUsd);
+            contadorCuadrado++;
+  
           }
-
-          for (int i = 0; i < listaIndicesParaBorrar.size(); i++) {
-            int indiceBorrar = indicesTransLimite.indexOf(listaIndicesParaBorrar.get(i));
-            indicesTransLimite.remove(indiceBorrar);
-          }
-
-          infoCudrado.get(contadorCuadrado).add(totalTransacciones);
-          infoCudrado.get(contadorCuadrado).add(totalFeeUsd);
-          infoCudrado.get(contadorCuadrado).add(totalValueUsd);
-          contadorCuadrado++;
-
+  
         }
-
+  
+        // llama la función que dibuja
+        dibujo1 DrawWindow = new dibujo1();
+        DrawWindow.setSize(960, 960);
+        DrawWindow.setResizable(false);
+        DrawWindow.setTitle("Pintando locales y ventas");
+        DrawWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        DrawWindow.setVisible(true);
+      }else{
+        JOptionPane.showMessageDialog(null, "Recordar que los lados de cuadricula tiene que ser multiplos 5");
       }
 
-      // llama la función que dibuja
-      dibujo1 DrawWindow = new dibujo1();
-      DrawWindow.setSize(960, 960);
-      DrawWindow.setResizable(false);
-      DrawWindow.setTitle("Pintando locales y ventas");
-      DrawWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-      DrawWindow.setVisible(true);
+
+      
     };
 
     public class dibujo1 extends JFrame implements ActionListener {

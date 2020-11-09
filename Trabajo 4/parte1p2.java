@@ -111,6 +111,10 @@ public class parte1p2 {
 
           // Supuesto. Los unicos decimales comienzan en 0
           String ValueUsd = resultado.getString("value_usd");
+          
+          if (ValueUsd.contains(",")){
+            ValueUsd = ValueUsd.replaceAll(",", ".");
+          }
           String nuevoValueUsd = ValueUsd;
           if (ValueUsd.contains(".")) {
             if (!(ValueUsd.split("\\.")[0].equals("0"))) { // Entero
@@ -124,6 +128,10 @@ public class parte1p2 {
 
           // Supuesto. Los unicos decimales comienzan en 0
           String feeUsd = resultado.getString("fee_usd");
+        
+          if (feeUsd.contains(",")){
+            feeUsd = feeUsd.replaceAll(",", ".");
+          }
           String nuevofeeUsd = feeUsd;
           if (feeUsd.contains(".")) {
             if (!(feeUsd.split("\\.")[0].equals("0"))) { // Entero
@@ -473,3 +481,4 @@ public class parte1p2 {
     ventana1 gj = x.new ventana1();
   }
 }
+

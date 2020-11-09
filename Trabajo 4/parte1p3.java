@@ -103,6 +103,10 @@ public class parte1p3 {
 
           // Supuesto. Los unicos decimales comienzan en 0
           String ValueUsd = resultado.getString("value_usd");
+
+          if (ValueUsd.contains(",")){
+            ValueUsd = ValueUsd.replaceAll(",", ".");
+          }
           String nuevoValueUsd = ValueUsd;
           if (ValueUsd.contains(".")) {
             if (!(ValueUsd.split("\\.")[0].equals("0"))) { // Entero

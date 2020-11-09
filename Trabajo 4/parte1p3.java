@@ -218,6 +218,10 @@ public class parte1p3 {
             }
           }
         }
+        
+        System.out.println("Miner1");
+        System.out.println(listaMiner1.get(i));
+        System.out.println(suma);
 
         double escala = 550/ValorUsdMayor;
         double valor = listaMiner1.get(i);
@@ -249,6 +253,10 @@ public class parte1p3 {
               }
             }
           }
+          
+          System.out.println("Miner2");
+          System.out.println(listaMiner2.get(i));
+          System.out.println(suma);
   
           double escala = 550/ValorUsdMayor;
           double valor = listaMiner2.get(i);

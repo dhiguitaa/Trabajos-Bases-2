@@ -15,6 +15,8 @@ import java.awt.FlowLayout;
 import multichain.command.*;
 import multichain.object.*;
 import sun.net.www.content.image.jpeg;
+import java.util.ArrayList;
+import java.util.List;
 
 import java.sql.*;
 
@@ -78,12 +80,15 @@ public class parte2p2 {
         bRegistro.addActionListener(new ActionListener() {
           @Override
           public void actionPerformed(ActionEvent e) {
-            System.out.println(" im working. att: button");
             String nombreUsuario = usuario.getText();
             String usContrasena = contrasena.getText();
             try {
               // se crea la nueva direccion
+              // Permission[] permisos = {connect,recive,send};
               Object direccion = cm.invoke(CommandElt.GETNEWADDRESS);
+              cm.invoke(CommandElt.GRANT,String.valueOf(direccion),"connect");
+              cm.invoke(CommandElt.GRANT,String.valueOf(direccion),"send");
+              cm.invoke(CommandElt.GRANT,String.valueOf(direccion),"receive");
               // se agrega la info a la bd
               PreparedStatement stmtInsertar = conn.prepareStatement("INSERT INTO usuario VALUES (?,?,?)");
               stmtInsertar.setString(1, nombreUsuario);
@@ -130,7 +135,7 @@ public class parte2p2 {
             try {
               // se agrega la info a la bd
               resultado = sentencia
-                  .executeQuery("select contrasena from usuario where nombre_usuario=" + "'" + nombreUsuario + "'");
+                  .executeQuery("select * from usuario where nombre_usuario=" + "'" + nombreUsuario + "'");
               boolean vacio = true;
               while (resultado.next()) {
                 vacio = false;
@@ -138,7 +143,7 @@ public class parte2p2 {
                   JOptionPane.showMessageDialog(null, "datos incorrectos");
                 } else if (usContrasena.equals(resultado.getString("contrasena"))) {
                   // cuadro de accciones
-                  acciones();
+                  acciones(nombreUsuario, resultado.getString("direccion"));
                 }
               }
               if (vacio) {
@@ -149,7 +154,7 @@ public class parte2p2 {
               System.out.println(err);
             }
             // cierra el diagol al hacer clic
-
+            ingreso.dispose();
           }
         });
         panel.add(JLusuario);
@@ -165,7 +170,7 @@ public class parte2p2 {
       }
     }
 
-    private void acciones() {
+    private void acciones(String nombreUsuario, String miDicreccion) {
       JButton consultar, pagar, cerrar;
       JDialog acciones = new JDialog(ingreso, true);
       JPanel p = new JPanel();
@@ -173,26 +178,96 @@ public class parte2p2 {
       pagar = new JButton("pagar");
       cerrar = new JButton("cerrar");
       // pagar
-      pagar.addActionListener((new ActionListener() {
+      pagar.addActionListener(new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
+          JDialog pagar = new JDialog(acciones, true);
+          JPanel pPagar = new JPanel();
+          JLabel Jlus = new JLabel("Usuario destino");
+          JLabel Jlvalor = new JLabel("Valor");
+          JTextField Jtus = new JTextField(15);
+          JTextField Jtvalor = new JTextField(15);
+          JButton bPagar = new JButton("pagar");
+          pPagar.add(Jlus);
+          pPagar.add(Jtus);
+          pPagar.add(Jlvalor);
+          pPagar.add(Jtvalor);
+          pPagar.add(bPagar);
+          pagar.add(pPagar);
+          
 
+          bPagar.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e){
+              System.out.println("hola");
+              String nombre = Jtus.getText(); 
+              int valor = Integer.parseInt(Jtvalor.getText());
+              
+              try {
+                resultado = sentencia
+                .executeQuery("select * from usuario where nombre_usuario ="+"'"+nombre+"'");
+                String sendTo="";
+                while(resultado.next()){
+                  sendTo = resultado.getString("direccion");
+                }
+                cm.invoke(CommandElt.SENDASSETFROM,miDicreccion,sendTo,"bdcoin",valor);
+                System.out.println("okay");
+              } catch (Exception err) {
+                System.out.println(err);
+              }
+              // cm.invoke(CommandElt.SENDFROM, )
+            }
+          });
+
+          pagar.pack();
+          pagar.setSize(450, 300);
+          pagar.setResizable(false);
+          pagar.setVisible(true);
         }
-      }));
+      });
       // cerrar
       cerrar.addActionListener((new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
-
+          acciones.dispose();
         }
       }));
       // consultar
-      consultar.addActionListener((new ActionListener() {
+      consultar.addActionListener(new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
+          JDialog consultar = new JDialog(acciones, true);
+          JPanel pConsultar = new JPanel();
+          JLabel Jlsaldo = new JLabel();
+          JButton salirSaldo = new JButton("Salir");
+          
+          
+          try {
+            ArrayList<BalanceAssetGeneral> list =(ArrayList<BalanceAssetGeneral>) cm.invoke(CommandElt.GETADDRESSBALANCES,miDicreccion);
+            String valor = String.valueOf(list.get(0).getQty());
+            Jlsaldo.setText(valor);
+            pConsultar.add(Jlsaldo);
 
+          } catch (Exception err) {
+            System.out.println(err);
+          }
+          pConsultar.add(salirSaldo);
+          salirSaldo.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e){             
+              consultar.dispose();
+              // cm.invoke(CommandElt.SENDFROM, )
+            }
+          });
+          consultar.add(pConsultar);
+          consultar.pack();
+          consultar.setSize(450, 300);
+          consultar.setResizable(false);
+          consultar.setVisible(true);
         }
-      }));
+        
+      });
+    
       p.add(consultar);
       p.add(pagar);
       p.add(cerrar);

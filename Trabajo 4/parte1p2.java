@@ -85,7 +85,7 @@ public class parte1p2 {
       }
 
       try { // Se establece la conexi�n con la base de datos Oracle Express
-        conn = DriverManager.getConnection("jdbc:oracle:thin:@DESKTOP-KBMHID4:1521:xe","augusto","rxnlomejor");
+        conn = DriverManager.getConnection("jdbc:oracle:thin:@DESKTOP-LV4ONBF:1521:xe", "dani", "dani");
         sentencia = conn.createStatement();
       } catch (final SQLException err) {
         System.out.println("No hay conexi�n con la base de datos.");
@@ -260,7 +260,7 @@ public class parte1p2 {
   
         // llama la función que dibuja
         dibujo1 DrawWindow = new dibujo1();
-        DrawWindow.setSize(960, 960);
+        DrawWindow.setSize(760, 760);
         DrawWindow.setResizable(false);
         DrawWindow.setTitle("Pintando locales y ventas");
         DrawWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -278,22 +278,22 @@ public class parte1p2 {
       public void paint(Graphics g) {
 
         g.setColor(Color.black);
-        g.fillRect(20, 40, 900, 900);
+        g.fillRect(20, 40, 700, 700);
         Color[] listaColores = { Color.YELLOW, Color.BLUE, Color.CYAN, Color.GRAY, Color.LIGHT_GRAY, Color.GREEN,
             Color.MAGENTA, Color.ORANGE, Color.PINK, Color.RED };
 
         int y = 0;
         int x = 0;
-        int h = ladoCuadricula * 9;
-        int w = ladoCuadricula * 9;
+        int h = ladoCuadricula * 7;
+        int w = ladoCuadricula * 7;
         int contador = 0;
         int numeroCuadro = 1;
         Double cuadroLado = Math.sqrt(infoCudrado.size());
         // recoremos los cuadrados para dibujar su informacion
         for (List<Double> list : infoCudrado) {
           // miramos que Y no se pase de los limites
-          if (y + h > 900 - cuadroLado) {
-            h = 900 - y - 1;
+          if (y + h > 700 - cuadroLado) {
+            h = 700 - y - 1;
           }
           double total = list.get(0);
           int indiceRango = 0;
@@ -328,12 +328,12 @@ public class parte1p2 {
             // si la w o la h son menores es porque se pasaban pero ahora tenemos que
             // formatearlas
             // miramos si la x se pasa
-            if (x + w > 900 - cuadroLado) {
-              w = 900 - x - 1;
-              h = ladoCuadricula * 9;
-            } else if (w < ladoCuadricula * 9 || h < ladoCuadricula * 9) {
-              w = ladoCuadricula * 9;
-              h = ladoCuadricula * 9;
+            if (x + w > 700 - cuadroLado) {
+              w = 700 - x - 1;
+              h = ladoCuadricula * 7;
+            } else if (w < ladoCuadricula * 7|| h < ladoCuadricula * 7) {
+              w = ladoCuadricula * 7;
+              h = ladoCuadricula * 7;
             }
             contador = 0;
           }

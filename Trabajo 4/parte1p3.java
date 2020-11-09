@@ -81,7 +81,7 @@ public class parte1p3 {
       }
 
       try { // Se establece la conexi�n con la base de datos Oracle Express
-        conn = DriverManager.getConnection("jdbc:oracle:thin:@DESKTOP-KBMHID4:1521:xe","augusto","rxnlomejor");
+        conn = DriverManager.getConnection("jdbc:oracle:thin:@DESKTOP-LV4ONBF:1521:xe", "dani", "dani");
         sentencia = conn.createStatement();
       } catch (final SQLException err) {
         System.out.println("No hay conexi�n con la base de datos.");

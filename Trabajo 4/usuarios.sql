@@ -5,4 +5,4 @@ create table usuario(
   direccion varchar(4000)
 );
 
-insert into usuario values('admin','admin','1Wco4YpGpGkZ76YFfeEHo7twX9ujbyvHkwCzeD');
+insert into usuario values('admin','admin','1JhQHubeM55EkULmaKP8FWmCN6EKgZYtoDkwTi');

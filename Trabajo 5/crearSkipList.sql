@@ -2,9 +2,11 @@ DECLARE
   TYPE tipo_int IS TABLE OF NUMBER
   INDEX BY BINARY_INTEGER;
   codigos tipo_int;   
+  cantidadPunteros tipo_int;   
   swapped BOOLEAN;
   tmp     VARCHAR2(10);
   indice NUMBER(30);
+  maxPtrs NUMBER(10);
 BEGIN
   indice :=0;
   FOR fila IN (SELECT codigoD FROM departamento)
@@ -36,12 +38,21 @@ BEGIN
 
   END LOOP; 
 
-  FOR i in codigos.FIRST .. codigos.LAST
-  LOOP
+  -- random
+  maxPtrs := 8;
 
-    dbms_output.put_line(codigos(i));
+  for i in 1 .. codigos.LAST LOOP
+    cantidadPunteros(i) := round(DBMS_RANDOM.VALUE(1,maxPtrs));
+  END LOOP
+  ; 
+
+  FOR i in cantidadPunteros.FIRST .. cantidadPunteros.LAST
+  LOOP
+    dbms_output.put_line(cantidadPunteros(i));
 
   END LOOP;
+
+  
 
 END;
 /

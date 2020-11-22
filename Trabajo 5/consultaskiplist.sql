@@ -1,17 +1,15 @@
-declare
+CREATE OR REPLACE PROCEDURE ConsultaDpto(numBusqueda IN NUMBER) IS
 TYPE tipo_int IS TABLE OF Number(30) INDEX BY BINARY_INTEGER;
 TYPE tipo_nodos IS TABLE OF tipo_int INDEX BY BINARY_INTEGER;
 punteros tipo_int;
 nodos tipo_nodos;
 indice number(30);
 nodoInicio number(30);
-numBusqueda number(30);
 puntero number(30);
 nodoFin number(30);
 nom varchar2(20);
 dir varchar2(20);
 begin
-  numBusqueda := 3;
   -- sacar el max de pisos
   FOR fila IN (SELECT * FROM indexdepskip) LOOP
     indice := 1;    
@@ -122,10 +120,10 @@ begin
       exit;
     elsif nodos(nodoFin)(0) < numBusqueda then
       nodoInicio := nodoFin;
-      dbms_output.put_line('Como el codigoD del nodo fin es menor que el codigoD buscado entonces se actualiza nodo inicio por nodo fin');
+      dbms_output.put_line('Como el codigoD del nodo fin es menor que '||numBusqueda||' entonces se actualiza nodo inicio por nodo fin');
     else
       puntero := puntero-1;
-      dbms_output.put_line('Como el codigoD del nodo fin NO es menor que el codigoD buscado entonces NO se actualiza nodo inicio por nodo fin');
+      dbms_output.put_line('Como el codigoD del nodo fin NO es menor que '||numBusqueda||' entonces NO se actualiza nodo inicio por nodo fin');
     end if;
 
     -- no existe

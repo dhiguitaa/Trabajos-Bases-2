@@ -25,9 +25,7 @@ BEGIN
 
   -- ordena los codigoD
     LOOP
-
     swapped := false;
-
     FOR i IN 3 .. codigos.LAST
     LOOP
 
@@ -37,9 +35,7 @@ BEGIN
         codigos(i) := codigos(i-1);
         codigos(i-1) := tmp;
         swapped := true;
-
         END IF;
-
     END LOOP;
 
     EXIT WHEN NOT swapped;
@@ -88,6 +84,6 @@ BEGIN
   else
     dbms_output.put_line('El maxPtrs tiene que ser potencia de 2 (1,2,4,8,16)');
 
-  end if
+  end if;
 END;
 /

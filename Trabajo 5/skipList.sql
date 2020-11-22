@@ -1,10 +1,10 @@
 drop table indexdepskip;
 create table indexdepskip(
   numnodo number(30) PRIMARY KEY,
-  codigoD NUMBER(8) Not null, 
-  nombreD VARCHAR2(20) NOT NULL,
-  direccionD VARCHAR2(20) NOT NULL,
-  ptrback number(30) not null,
+  codigoD NUMBER(8), 
+  nombreD VARCHAR2(20),
+  direccionD VARCHAR2(20),
+  ptrback number(30),
   puntero1 number(30),
   puntero2 number(30),
   puntero3 number(30),

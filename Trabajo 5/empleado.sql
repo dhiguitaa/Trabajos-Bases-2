@@ -17,3 +17,5 @@ insert into empleado values(22,'b',2);
 insert into empleado values(60,'f',6);
 insert into empleado values(50,'e',5);
 insert into empleado values(90,'re',9);
+
+insert into empleado values(900,'hola',90);

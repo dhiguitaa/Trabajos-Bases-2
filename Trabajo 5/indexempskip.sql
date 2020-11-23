@@ -45,6 +45,7 @@ INSERT INTO indexempskip VALUES(1,
                          tipo_infoEmp(13,'13'),
                          tipo_infoEmp(17,'17'))
                          );
+                         
 INSERT INTO TABLE(SELECT infoEmp FROM indexempskip WHERE depE = 1)
 VALUES(tipo_infoEmp(11,'a'));
 

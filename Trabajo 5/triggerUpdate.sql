@@ -1,5 +1,5 @@
-CREATE OR REPLACE TRIGGER insert_dpto
-before INSERT ON departamento 
+CREATE OR REPLACE TRIGGER update_dpto
+before UPDATE ON departamento 
 FOR EACH ROW 
 declare
   TYPE tipo_int IS TABLE OF NUMBER(8) INDEX BY BINARY_INTEGER;
@@ -13,10 +13,11 @@ declare
   cantidadPunteros tipo_int;  
   nombresDep tipo_var; 
   direccionesDep tipo_var; 
+  punterosNew number(8);
   indice number(30);
   aux NUMBER(10);
 BEGIN
-
+    aux := 1;
     -- sacar informacion vieja
     FOR fila IN (SELECT * FROM indexdepskip) LOOP
       indice := 0;    
@@ -85,10 +86,15 @@ BEGIN
         indice := indice + 1;
       END IF;
 
-      cantidadPunterosViejos(fila.numnodo) := indice;
-      nombresDepViejos(fila.numnodo) := fila.nombreD;
-      direccionesDepViejos(fila.numnodo) := fila.direccionD;
-      codigosViejos(fila.numnodo) := fila.codigoD;
+      if fila.codigoD =  :old.codigoD then
+        punterosNew := indice;
+      else 
+        cantidadPunterosViejos(aux) := indice;
+        nombresDepViejos(aux) := fila.nombreD;
+        direccionesDepViejos(aux) := fila.direccionD;
+        codigosViejos(aux) := fila.codigoD;
+        aux := aux +1;
+      end if;
     end loop;
 
     if codigosViejos.count != 0 then
@@ -121,7 +127,7 @@ BEGIN
       codigos(indice) := :new.codigoD;
       nombresDep(indice) := :new.nombreD;
       direccionesDep(indice) := :new.direccionD;
-      cantidadPunteros(indice) := round(DBMS_RANDOM.VALUE(1,cantidadPunteros(1)));
+      cantidadPunteros(indice) := punterosNew;
       
       for i in indice .. cantidadPunterosViejos.last loop
         codigos(i+1) := codigosViejos(i);
@@ -156,7 +162,7 @@ BEGIN
       aux := cantidadPunteros.LAST;
       insert into indexdepskip values(aux,null,null,null,aux-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1); 
     end if;
-      dbms_output.put_line('Nuevo dato insertado');
+      dbms_output.put_line('Datos modificados');
 
 END;
 /

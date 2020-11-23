@@ -49,3 +49,5 @@ INSERT INTO TABLE(SELECT infoEmp FROM indexempskip WHERE depE = 1)
 VALUES(tipo_infoEmp(11,'a'));
 
 UPDATE TABLE(SELECT * FROM indexempskip WHERE depE = 1) SET v = 10 WHERE x = 10 AND y = 10;
+
+SELECT depE, t2.* FROM indexempskip t, TABLE(t.infoEmp) t2 Where depE = 1;

@@ -12,3 +12,9 @@ insert into departamento values(6,'f','direccion f');
 insert into departamento values(5,'e','direccion e');
 
 
+
+delete from departamento;
+execute crearsl(8);
+
+DELETE FROM your_table
+WHERE id IN (value1, value2, ...);

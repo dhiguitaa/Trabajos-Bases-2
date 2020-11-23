@@ -114,7 +114,7 @@ begin
     
     if nodos(nodoFin)(0) = numBusqueda then
       dbms_output.put_line('Encontrado!!: ');
-      for fila in (SELECT depE, t2.* FROM indexempskip t, TABLE(t.infoEmp) t2 Where depE = 1) loop
+      for fila in (SELECT depE, t2.* FROM indexempskip t, TABLE(t.infoEmp) t2 Where depE = numBusqueda) loop
         dbms_output.put_line('nombre: '||fila.nombre||', codigo: '||fila.id);
         dbms_output.put_line('---------');
       end loop;

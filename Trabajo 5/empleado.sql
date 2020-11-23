@@ -20,4 +20,6 @@ insert into empleado values(90,'re',9);
 
 insert into empleado values(900,'hola',90);
 
-UPDATE empleado SET nombreE = 'augusto' WHERE codigoE=90;
+UPDATE empleado SET depE = 90 WHERE codigoE=90;
+
+delete from empleado where depE = 90 and;

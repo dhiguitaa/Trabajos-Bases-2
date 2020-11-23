@@ -1,7 +1,7 @@
 CREATE OR REPLACE PROCEDURE ConsultaDpto(numBusqueda IN NUMBER) IS
 TYPE tipo_int IS TABLE OF Number(30) INDEX BY BINARY_INTEGER;
 TYPE tipo_nodos IS TABLE OF tipo_int INDEX BY BINARY_INTEGER;
-punteros tipo_int;
+
 nodos tipo_nodos;
 indice number(30);
 nodoInicio number(30);

@@ -83,6 +83,16 @@ BEGIN
     END LOOP;
     aux := cantidadPunteros.LAST;
     insert into indexempskip values(aux,null,null,aux-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1); 
+
+    -- insertar datos restantes
+
+    for i in 2 .. codigos.last loop
+      for j in 2 .. codigosEmp(i).last loop 
+        INSERT INTO TABLE(SELECT infoEmp FROM indexempskip WHERE depE = codigos(i)) VALUES(tipo_infoEmp(codigosEmp(i)(j),nombresEmp(i)(j)));
+      end loop;
+    end loop;  
+
+
     dbms_output.put_line('Skip list creada');
   else
     dbms_output.put_line('El maxPtrs tiene que ser potencia de 2 (1,2,4,8,16)');

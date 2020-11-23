@@ -98,9 +98,7 @@ BEGIN
     indice := 0;
 
     for i in 2 .. cantidadPunterosViejos.last-1 loop
-      aux := :new.codigoD;
-      dbms_output.put_line(codigosViejos(i)||' '||aux);
-      if codigosViejos(i) > aux THEN
+      if codigosViejos(i) > :new.codigoD THEN
         indice := i;  
         exit;
       end if;
@@ -148,7 +146,6 @@ BEGIN
       if i = 1 then
         insert into indexdepskip values(i,null,null,null,null,punterosPorNodo(1),punterosPorNodo(2),punterosPorNodo(3),punterosPorNodo(4),punterosPorNodo(5),punterosPorNodo(6),punterosPorNodo(7),punterosPorNodo(8),punterosPorNodo(9),punterosPorNodo(10),punterosPorNodo(11),punterosPorNodo(12),punterosPorNodo(13),punterosPorNodo(14),punterosPorNodo(15),punterosPorNodo(16));
       else
-        dbms_output.put_line('ingresar el resto'||i||codigos(i)||nombresDep(i)||direccionesDep(i));
         insert into indexdepskip values(i,codigos(i),nombresDep(i),direccionesDep(i),i-1,punterosPorNodo(1),punterosPorNodo(2),punterosPorNodo(3),punterosPorNodo(4),punterosPorNodo(5),punterosPorNodo(6),punterosPorNodo(7),punterosPorNodo(8),punterosPorNodo(9),punterosPorNodo(10),punterosPorNodo(11),punterosPorNodo(12),punterosPorNodo(13),punterosPorNodo(14),punterosPorNodo(15),punterosPorNodo(16));  
       end if;
       punterosPorNodo.delete();

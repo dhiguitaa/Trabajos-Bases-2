@@ -19,3 +19,5 @@ insert into empleado values(50,'e',5);
 insert into empleado values(90,'re',9);
 
 insert into empleado values(900,'hola',90);
+
+UPDATE empleado SET nombreE = 'augusto' WHERE codigoE=90;

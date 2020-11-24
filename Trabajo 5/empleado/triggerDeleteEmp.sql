@@ -111,26 +111,24 @@ BEGIN
       end if;
     end loop;
 
-
-    if codigosViejos.count != 0 then
+    -- borramos los datos de la tabla index
+    delete from indexempskip;
     
-      -- borramos los datos de la tabla index
-      delete from indexempskip;
-     
-      -- crearslemp
-      indice :=2;
-      FOR fila IN (SELECT DISTINCT depE FROM empleado)
-      LOOP
-        codigos(indice) := fila.depE;
-        indice := indice+1;
-      END LOOP;  
+    -- crearslemp
+    indice :=2;
+    FOR fila IN (SELECT DISTINCT depE FROM empleado)
+    LOOP
+      codigos(indice) := fila.depE;
+      indice := indice+1;
+    END LOOP;  
+
+    if codigos.count != 0 then
 
     -- ordena los codigoD
       LOOP
         swapped := false;
-        FOR i IN 3 .. codigos.LAST
+        FOR i IN 3 .. codigos.LAST      
         LOOP
-
           IF codigos(i-1) > codigos(i)
           THEN
             tmp := codigos(i);
@@ -139,7 +137,6 @@ BEGIN
             swapped := true;
             END IF;
         END LOOP;
-
       EXIT WHEN NOT swapped;
 
       END LOOP;

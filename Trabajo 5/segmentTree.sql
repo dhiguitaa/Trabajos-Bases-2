@@ -1,4 +1,5 @@
 create type arry is table of number(30);
+/
 create or replace function segmentTree(arr arry,ss in number,se in number,si in number) return number as
 valor number;
 mid number; 

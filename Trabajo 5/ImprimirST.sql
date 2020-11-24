@@ -37,7 +37,7 @@ begin
         nivel := floor(LOG(2, maxNodo)) ; 
         while nivel >= 0 loop
             inicio := POWER(2, nivel);
-            if nivel = maxNodo THEN
+            if nivel = floor(LOG(2, maxNodo)) THEN
                 fin := maxNodo;
             else
                 fin := POWER(2, nivel+1) - 1;
